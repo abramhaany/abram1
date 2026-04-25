@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>تحدي المعلومات</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -17,121 +17,97 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .screen{display:none;min-height:100vh;animation:fadeIn .3s ease}
 .screen.active{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-.logo{font-size:clamp(2rem,6vw,3.5rem);font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.2;margin-bottom:8px}
-.tagline{color:var(--text2);font-size:14px;text-align:center;margin-bottom:32px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:460px}
+.logo{font-size:clamp(1.8rem,5vw,3rem);font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;line-height:1.2;margin-bottom:6px}
+.tagline{color:var(--text2);font-size:13px;text-align:center;margin-bottom:24px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:100%;max-width:440px}
 .btn{display:block;width:100%;padding:14px 20px;border-radius:10px;border:none;font-family:var(--font);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center}
 .btn-primary{background:linear-gradient(135deg,var(--accent),#5b4fd4);color:#fff}
 .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
 .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
 .btn-secondary:hover{background:var(--surface3)}
 .btn+.btn{margin-top:10px}
-input,select{width:100%;padding:13px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:16px;outline:none;transition:border-color .2s;text-align:right}
+input,select{width:100%;padding:13px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:16px;outline:none;transition:border-color .2s;text-align:right}
 input:focus,select:focus{border-color:var(--accent)}
 select option{background:var(--surface2)}
 label{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;margin-top:16px;font-weight:600}
 label:first-child{margin-top:0}
-
-.room-code-display{
-  font-size:2.8rem;font-weight:900;letter-spacing:.25em;color:var(--gold);
-  text-align:center;padding:18px;background:var(--surface2);border-radius:12px;
-  border:2px dashed rgba(255,209,102,.4);direction:ltr;font-family:monospace;
-  user-select:all;cursor:pointer
-}
-.code-input{
-  text-transform:uppercase!important;letter-spacing:.15em;font-weight:900;
-  text-align:center!important;direction:ltr!important;font-size:20px!important;
-  padding:14px!important;font-family:monospace!important;
-}
-.code-hint{font-size:12px;color:var(--text2);text-align:center;margin-top:6px;font-weight:600}
-
+.how-box{background:rgba(124,111,255,.08);border:1px solid rgba(124,111,255,.25);border-radius:12px;padding:14px;margin-bottom:20px;font-size:13px;line-height:1.9;color:var(--text2)}
+.how-box strong{color:var(--accent);display:block;margin-bottom:6px;font-size:14px}
+.room-code-display{font-size:3rem;font-weight:900;letter-spacing:.2em;color:var(--gold);text-align:center;padding:16px;background:var(--surface2);border-radius:12px;border:2px dashed rgba(255,209,102,.4);direction:ltr;font-family:'Courier New',monospace;cursor:pointer;user-select:all}
+.code-field{font-family:'Courier New',monospace!important;font-size:22px!important;font-weight:900!important;text-align:center!important;letter-spacing:.15em!important;direction:ltr!important;text-transform:uppercase!important;}
+.code-hint{font-size:12px;color:var(--text2);text-align:center;margin-top:5px}
 .status-dot{width:10px;height:10px;border-radius:50%;display:block;margin:0 auto 6px}
-.dot-waiting{background:var(--gold);animation:pulse 1.5s infinite}
+.dot-waiting{background:var(--gold);animation:pulse 1.4s infinite}
 .dot-ready{background:var(--green)}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-.game-layout{width:100%;max-width:680px;display:flex;flex-direction:column;gap:14px}
-.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
-.player-score{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;transition:all .3s}
-.player-score.active-player{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.p-name{font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:700}
-.p-pts{font-size:2rem;font-weight:900;transition:all .3s}
-.p-pts.pts-green{color:var(--green)}
-.p-pts.pts-red{color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.game-layout{width:100%;max-width:660px;display:flex;flex-direction:column;gap:12px}
+.scoreboard{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.player-score{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:12px;transition:all .3s}
+.player-score.active-player{border-color:var(--accent);box-shadow:0 0 12px rgba(124,111,255,.2)}
+.p-name{font-size:11px;color:var(--text2);margin-bottom:3px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.p-pts{font-size:1.8rem;font-weight:900}
+.p-pts.g{color:var(--green)}
+.p-pts.r{color:var(--red)}
 .round-info{text-align:center}
-.round-num{font-size:11px;color:var(--text2);font-weight:700}
-.round-big{font-size:1.4rem;font-weight:900}
-
+.round-num{font-size:10px;color:var(--text2);font-weight:700}
+.round-big{font-size:1.3rem;font-weight:900}
+.timer-row{display:flex;align-items:center;gap:10px}
 .timer-bar-wrap{background:var(--surface2);border-radius:99px;height:8px;overflow:hidden;flex:1}
 .timer-bar{height:100%;border-radius:99px;transition:width 1s linear,background .3s;background:var(--green)}
 .timer-bar.warn{background:var(--gold)}
 .timer-bar.danger{background:var(--red)}
-.timer-num{font-size:1.6rem;font-weight:900;min-width:36px;text-align:center}
-
-.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
-.q-cat{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px}
-.q-badge{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;background:var(--surface2);color:var(--text2);margin-bottom:12px}
-.q-text{font-size:clamp(1rem,2.5vw,1.15rem);font-weight:700;line-height:1.65;margin-bottom:20px}
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.choice-btn{padding:14px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;line-height:1.4}
+.timer-num{font-size:1.5rem;font-weight:900;min-width:34px;text-align:center}
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.q-cat{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px}
+.q-badge{display:inline-block;font-size:11px;padding:2px 9px;border-radius:99px;background:var(--surface2);color:var(--text2);margin-bottom:10px}
+.q-text{font-size:clamp(.95rem,2.5vw,1.1rem);font-weight:700;line-height:1.65;margin-bottom:18px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choice-btn{padding:13px 10px;background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;line-height:1.4}
 .choice-btn:hover:not(:disabled){background:var(--surface3);border-color:var(--accent)}
 .choice-btn:disabled{cursor:default}
-.choice-btn.correct{background:rgba(6,214,160,.2);border-color:var(--green);color:var(--green)}
-.choice-btn.wrong{background:rgba(239,69,101,.15);border-color:var(--red);color:var(--red)}
-
-.turn-banner{text-align:center;padding:12px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);font-weight:700;font-size:15px}
+.choice-btn.correct{background:rgba(6,214,160,.2)!important;border-color:var(--green)!important;color:var(--green)!important}
+.choice-btn.wrong{background:rgba(239,69,101,.15)!important;border-color:var(--red)!important;color:var(--red)!important}
+.turn-banner{text-align:center;padding:11px;background:var(--surface2);border-radius:var(--radius);border:1px solid var(--border);font-weight:700;font-size:14px}
 .turn-banner.my-turn{border-color:var(--accent);background:rgba(124,111,255,.1)}
-
-.powerups{display:flex;gap:8px;justify-content:flex-start;flex-wrap:wrap}
-.pu-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 13px;cursor:pointer;font-size:13px;color:var(--text);font-family:var(--font);font-weight:700;transition:all .2s}
+.powerups{display:flex;gap:7px;flex-wrap:wrap}
+.pu-btn{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;color:var(--text);font-family:var(--font);font-weight:700;transition:all .2s}
 .pu-btn:hover:not(:disabled){border-color:var(--gold);color:var(--gold)}
-.pu-btn:disabled,.pu-btn.used{opacity:.25;cursor:default}
-
+.pu-btn:disabled,.pu-btn.used{opacity:.2;cursor:default}
 .chat-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
-.chat-msgs{height:100px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:5px}
-.chat-msg{font-size:13px;line-height:1.5;padding:6px 10px;border-radius:8px;max-width:80%;word-break:break-word;font-weight:600}
+.chat-msgs{height:90px;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:5px}
+.chat-msg{font-size:12px;line-height:1.5;padding:5px 9px;border-radius:7px;max-width:80%;word-break:break-word;font-weight:600}
 .chat-msg.me{background:rgba(124,111,255,.2);color:var(--accent);align-self:flex-start}
 .chat-msg.them{background:var(--surface2);color:var(--text2);align-self:flex-end}
-.chat-msg.system{background:none;color:var(--text2);font-size:12px;align-self:center;max-width:100%;opacity:.7;font-style:italic}
-.reactions{display:flex;gap:6px;padding:7px 12px;border-top:1px solid var(--border)}
-.react-btn{background:var(--surface2);border:none;padding:5px 9px;border-radius:99px;cursor:pointer;font-size:15px;transition:transform .15s}
+.chat-msg.system{background:none;color:var(--text2);font-size:11px;align-self:center;max-width:100%;opacity:.65;font-style:italic}
+.reactions{display:flex;gap:5px;padding:6px 10px;border-top:1px solid var(--border);flex-wrap:wrap}
+.react-btn{background:var(--surface2);border:none;padding:4px 8px;border-radius:99px;cursor:pointer;font-size:14px;transition:transform .15s}
 .react-btn:hover{transform:scale(1.3)}
-.chat-input-row{display:flex;gap:8px;padding:8px 12px;border-top:1px solid var(--border)}
-.chat-input-row input{margin:0;flex:1;padding:8px 12px;font-size:14px;text-align:right}
-.chat-send{padding:8px 14px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer}
-
-.result-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100}
-.result-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;max-width:380px;width:90%;text-align:center}
+.chat-input-row{display:flex;gap:7px;padding:7px 10px;border-top:1px solid var(--border)}
+.chat-input-row input{margin:0;flex:1;padding:7px 11px;font-size:13px;text-align:right}
+.chat-send{padding:7px 12px;background:var(--accent);border:none;border-radius:7px;color:#fff;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.result-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:100}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:30px;max-width:360px;width:90%;text-align:center}
 .result-emoji{font-size:3.5rem;margin-bottom:10px}
 .result-title{font-size:1.8rem;font-weight:900;margin-bottom:8px}
-.result-sub{color:var(--text2);margin-bottom:20px;line-height:1.6;font-weight:600}
-.scores-final{display:flex;justify-content:center;gap:28px;margin-bottom:24px}
+.result-sub{color:var(--text2);margin-bottom:18px;line-height:1.6;font-weight:600;font-size:14px}
+.scores-final{display:flex;justify-content:center;gap:28px;margin-bottom:22px}
 .sf-item{text-align:center}
-.sf-name{font-size:12px;color:var(--text2);margin-bottom:4px;font-weight:700}
-.sf-score{font-size:2.2rem;font-weight:900}
+.sf-name{font-size:11px;color:var(--text2);margin-bottom:3px;font-weight:700}
+.sf-score{font-size:2rem;font-weight:900}
 .sf-score.winner{color:var(--gold)}
-
-.notif{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 20px;font-size:14px;font-weight:700;z-index:300;white-space:nowrap;font-family:var(--font);animation:slideDown .3s}
-@keyframes slideDown{from{opacity:0;top:0}to{opacity:1;top:16px}}
+.notif{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:14px;font-weight:700;z-index:300;white-space:nowrap;font-family:var(--font);animation:slideDown .3s;max-width:90vw;text-align:center}
+@keyframes slideDown{from{opacity:0;top:0}to{opacity:1;top:14px}}
 .notif.success{border-color:var(--green);color:var(--green)}
 .notif.error{border-color:var(--red);color:var(--red)}
 .notif.info{border-color:var(--accent);color:var(--accent)}
-
-.loading-dots span{display:inline-block;animation:lb 1.2s infinite}
-.loading-dots span:nth-child(2){animation-delay:.2s}
-.loading-dots span:nth-child(3){animation-delay:.4s}
-@keyframes lb{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-7px)}}
-
-.divider{display:flex;align-items:center;gap:10px;margin:18px 0}
+.dot-loading span{display:inline-block;animation:lb 1.2s infinite}
+.dot-loading span:nth-child(2){animation-delay:.2s}
+.dot-loading span:nth-child(3){animation-delay:.4s}
+@keyframes lb{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+.divider{display:flex;align-items:center;gap:10px;margin:16px 0}
 .divider span{flex:1;height:1px;background:var(--border)}
-.divider p{color:var(--text2);font-size:13px;white-space:nowrap}
-
-@media(max-width:480px){
-  .choices{grid-template-columns:1fr}
-  .scoreboard{gap:6px}
-  .p-pts{font-size:1.5rem}
-  .room-code-display{font-size:2rem;letter-spacing:.15em}
-}
+.divider p{color:var(--text2);font-size:12px;white-space:nowrap}
+@media(max-width:440px){.choices{grid-template-columns:1fr}.p-pts{font-size:1.4rem}.room-code-display{font-size:2.2rem}}
 </style>
 </head>
 <body>
@@ -139,73 +115,77 @@ label:first-child{margin-top:0}
 <!-- الرئيسية -->
 <div id="screen-home" class="screen active">
   <div class="logo">⚡ تحدي المعلومات</div>
-  <div class="tagline">العب ضد صديقك في الوقت الفعلي — من الأذكى؟</div>
+  <div class="tagline">العب ضد صديقك — من الأذكى؟</div>
   <div class="card">
+    <div class="how-box">
+      <strong>⚠️ طريقة اللعب (على نفس الجهاز)</strong>
+      ١- اللاعب الأول يُنشئ غرفة ويحفظ الكود<br>
+      ٢- يفتح <b>تبويب جديد</b> في نفس المتصفح<br>
+      ٣- في التبويب الجديد يُدخل اسم مختلف والكود وينضم<br>
+      ٤- يرجع للتبويب الأول ويضغط <b>ابدأ اللعبة</b>
+    </div>
+
     <label>اسمك</label>
-    <input id="player-name" placeholder="أدخل اسمك" maxlength="20" autocomplete="off">
-    
-    <label style="margin-top:18px">الفئة</label>
-    <select id="category-select">
+    <input id="player-name" placeholder="أدخل اسمك" maxlength="20"
+           autocomplete="off" autocorrect="off" spellcheck="false">
+
+    <label style="margin-top:16px">الفئة</label>
+    <select id="cat-sel">
       <option value="general">🌍 معلومات عامة</option>
       <option value="science">🔬 علوم وتكنولوجيا</option>
-      <option value="quran">📖 قرآن وإسلاميات</option>
+      <option value="bible">✝️ الكتاب المقدس</option>
       <option value="history">📜 تاريخ وحضارات</option>
       <option value="sports">⚽ رياضة</option>
       <option value="arab">🗺️ الوطن العربي</option>
       <option value="movies">🎬 أفلام ومسلسلات</option>
     </select>
 
-    <button class="btn btn-primary" style="margin-top:20px" onclick="createRoom()">🏠 إنشاء غرفة جديدة</button>
-    
+    <button class="btn btn-primary" style="margin-top:18px" onclick="createRoom()">🏠 إنشاء غرفة جديدة</button>
+
     <div class="divider"><span></span><p>أو انضم لغرفة موجودة</p><span></span></div>
-    
+
     <label>كود الغرفة</label>
-    <input 
-      id="join-code" 
-      class="code-input"
-      placeholder="مثال: AB3K7Z" 
-      maxlength="6" 
-      autocomplete="off"
-      autocorrect="off"
-      autocapitalize="characters"
-      spellcheck="false"
-      inputmode="text"
-      oninput="formatCode(this)"
-      onpaste="handlePaste(event)"
-    >
-    <div class="code-hint">⚠️ الكود يُكتب تلقائياً بأحرف كبيرة</div>
+    <input id="join-code" class="code-field"
+           placeholder="أدخل الكود هنا"
+           maxlength="6"
+           autocomplete="off" autocorrect="off"
+           autocapitalize="none" spellcheck="false"
+           inputmode="text"
+           oninput="cleanCode(this)"
+           onpaste="onPaste(event)">
+    <div class="code-hint">الكود 6 أحرف — يتحول تلقائياً لأحرف كبيرة</div>
     <button class="btn btn-secondary" style="margin-top:10px" onclick="joinRoom()">🚪 الانضمام للغرفة</button>
   </div>
 </div>
 
-<!-- انتظار -->
+<!-- الانتظار -->
 <div id="screen-lobby" class="screen">
-  <div class="logo" style="font-size:2rem;margin-bottom:4px">🕹️ انتظار اللاعبين</div>
-  <div class="tagline">شارك الكود مع صديقك</div>
+  <div class="logo" style="font-size:1.8rem;margin-bottom:4px">🕹️ غرفة الانتظار</div>
+  <div class="tagline">شارك الكود مع صديقك في التبويب الآخر</div>
   <div class="card">
-    <div style="text-align:center;margin-bottom:18px">
-      <p style="color:var(--text2);font-size:13px;margin-bottom:8px;font-weight:600">كود الغرفة — اضغط لنسخه</p>
-      <div class="room-code-display" id="room-code-display" onclick="copyCode()">------</div>
-      <button onclick="copyCode()" style="margin-top:8px;background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;font-family:var(--font);font-weight:700">📋 نسخ الكود</button>
+    <p style="color:var(--text2);font-size:12px;text-align:center;margin-bottom:8px;font-weight:600">كود الغرفة — اضغط لنسخه</p>
+    <div class="room-code-display" id="room-code-display" onclick="copyCode()">------</div>
+    <div style="text-align:center;margin-top:8px">
+      <button onclick="copyCode()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:700">📋 نسخ الكود</button>
     </div>
-    
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
-      <div style="background:var(--surface2);border-radius:10px;padding:14px;text-align:center">
-        <div id="p1-lobby-status" class="status-dot dot-waiting"></div>
-        <div id="p1-lobby-name" style="font-weight:700;font-size:14px">—</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:3px">اللاعب الأول</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0">
+      <div style="background:var(--surface2);border-radius:10px;padding:12px;text-align:center">
+        <div id="p1-dot" class="status-dot dot-waiting"></div>
+        <div id="p1-name" style="font-weight:700;font-size:14px">—</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">اللاعب الأول</div>
       </div>
-      <div style="background:var(--surface2);border-radius:10px;padding:14px;text-align:center">
-        <div id="p2-lobby-status" class="status-dot dot-waiting"></div>
-        <div id="p2-lobby-name" style="font-weight:700;font-size:14px">في الانتظار...</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:3px">اللاعب الثاني</div>
+      <div style="background:var(--surface2);border-radius:10px;padding:12px;text-align:center">
+        <div id="p2-dot" class="status-dot dot-waiting"></div>
+        <div id="p2-name" style="font-weight:700;font-size:14px">في الانتظار...</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">اللاعب الثاني</div>
       </div>
     </div>
 
-    <div id="lobby-status-msg" style="text-align:center;color:var(--text2);font-size:14px;margin-bottom:14px;font-weight:600">
-      <span class="loading-dots"><span>•</span><span>•</span><span>•</span></span> في انتظار المنافس
+    <div id="lobby-msg" style="text-align:center;color:var(--text2);font-size:13px;margin-bottom:12px;font-weight:600">
+      <span class="dot-loading"><span>•</span><span>•</span><span>•</span></span> في انتظار المنافس
     </div>
-    <div id="start-btn-wrap" style="display:none">
+    <div id="start-wrap" style="display:none">
       <button class="btn btn-primary" onclick="startGame()">🚀 ابدأ اللعبة!</button>
     </div>
     <button class="btn btn-secondary" style="margin-top:10px" onclick="leaveRoom()">← العودة</button>
@@ -213,57 +193,58 @@ label:first-child{margin-top:0}
 </div>
 
 <!-- اللعبة -->
-<div id="screen-game" class="screen" style="padding:14px 16px">
+<div id="screen-game" class="screen" style="padding:12px 14px">
   <div class="game-layout">
     <div class="scoreboard">
       <div class="player-score" id="score-p1">
         <div class="p-name" id="sname1">اللاعب 1</div>
-        <div class="p-pts" id="spts1">0</div>
+        <div class="p-pts g" id="spts1">0</div>
       </div>
       <div class="round-info">
         <div class="round-num">الجولة</div>
-        <div class="round-big" id="round-counter">1/10</div>
+        <div class="round-big" id="round-disp">1/10</div>
       </div>
       <div class="player-score" id="score-p2" style="text-align:left">
         <div class="p-name" id="sname2">اللاعب 2</div>
-        <div class="p-pts" id="spts2">0</div>
+        <div class="p-pts g" id="spts2">0</div>
       </div>
     </div>
 
-    <div style="display:flex;align-items:center;gap:12px">
-      <div class="timer-num" id="timer-num">25</div>
-      <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
+    <div class="timer-row">
+      <div class="timer-num" id="t-num">25</div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="t-bar"></div></div>
     </div>
 
-    <div class="turn-banner my-turn" id="turn-banner">
-      <span id="turn-text">🎯 اختر إجابتك!</span>
+    <div class="turn-banner my-turn">
+      <span id="turn-txt">🎯 اختر إجابتك!</span>
     </div>
 
     <div class="powerups">
-      <button class="pu-btn" id="pu-skip" onclick="useSkip()">⏭ تخطي</button>
-      <button class="pu-btn" id="pu-double" onclick="useDouble()">⚡ نقاط ×2</button>
-      <button class="pu-btn" id="pu-hint" onclick="useHint()">💡 50/50</button>
+      <button class="pu-btn" id="pu-skip"   onclick="useSkip()">⏭ تخطي</button>
+      <button class="pu-btn" id="pu-double" onclick="useDouble()">⚡ ×2</button>
+      <button class="pu-btn" id="pu-hint"   onclick="useHint()">💡 50/50</button>
     </div>
 
     <div class="q-card">
-      <div class="q-cat" id="q-cat">...</div>
+      <div class="q-cat"   id="q-cat">...</div>
       <div class="q-badge" id="q-badge">اختيار من متعدد</div>
-      <div class="q-text" id="q-text">جاري تحميل السؤال...</div>
-      <div id="q-answers"></div>
+      <div class="q-text"  id="q-text">جاري التحميل...</div>
+      <div id="q-ans"></div>
     </div>
 
     <div class="chat-wrap">
       <div class="chat-msgs" id="chat-msgs"></div>
       <div class="reactions">
-        <button class="react-btn" onclick="sendReaction('🔥')">🔥</button>
-        <button class="react-btn" onclick="sendReaction('😂')">😂</button>
-        <button class="react-btn" onclick="sendReaction('😤')">😤</button>
-        <button class="react-btn" onclick="sendReaction('👏')">👏</button>
-        <button class="react-btn" onclick="sendReaction('💀')">💀</button>
-        <button class="react-btn" onclick="sendReaction('🤔')">🤔</button>
+        <button class="react-btn" onclick="react('🔥')">🔥</button>
+        <button class="react-btn" onclick="react('😂')">😂</button>
+        <button class="react-btn" onclick="react('😤')">😤</button>
+        <button class="react-btn" onclick="react('👏')">👏</button>
+        <button class="react-btn" onclick="react('💀')">💀</button>
+        <button class="react-btn" onclick="react('🤔')">🤔</button>
       </div>
       <div class="chat-input-row">
-        <input id="chat-input" placeholder="قل شيئاً..." maxlength="80" onkeydown="if(event.key==='Enter')sendChat()">
+        <input id="chat-in" placeholder="قل شيئاً..." maxlength="80"
+               onkeydown="if(event.key==='Enter')sendChat()">
         <button class="chat-send" onclick="sendChat()">إرسال</button>
       </div>
     </div>
@@ -271,20 +252,14 @@ label:first-child{margin-top:0}
 </div>
 
 <!-- النتيجة -->
-<div id="result-overlay" class="result-overlay" style="display:none">
+<div id="result-ov" class="result-overlay" style="display:none">
   <div class="result-card">
-    <div class="result-emoji" id="res-emoji">🏆</div>
-    <div class="result-title" id="res-title">الفائز!</div>
-    <div class="result-sub" id="res-sub">لعبة رائعة!</div>
+    <div class="result-emoji" id="res-em">🏆</div>
+    <div class="result-title" id="res-ti">الفائز!</div>
+    <div class="result-sub"   id="res-su">لعبة رائعة!</div>
     <div class="scores-final">
-      <div class="sf-item">
-        <div class="sf-name" id="rf-name1">ل1</div>
-        <div class="sf-score" id="rf-score1">0</div>
-      </div>
-      <div class="sf-item">
-        <div class="sf-name" id="rf-name2">ل2</div>
-        <div class="sf-score" id="rf-score2">0</div>
-      </div>
+      <div class="sf-item"><div class="sf-name" id="rf-n1">ل1</div><div class="sf-score" id="rf-s1">0</div></div>
+      <div class="sf-item"><div class="sf-name" id="rf-n2">ل2</div><div class="sf-score" id="rf-s2">0</div></div>
     </div>
     <button class="btn btn-primary" onclick="playAgain()">🔄 العب مجدداً</button>
     <button class="btn btn-secondary" style="margin-top:10px" onclick="goHome()">🏠 الرئيسية</button>
@@ -292,395 +267,415 @@ label:first-child{margin-top:0}
 </div>
 
 <script>
-const TOTAL_ROUNDS=10, TIMER_SECS=25, PTS_CORRECT=10;
-let myName='',myRole='',roomCode='';
-let bc=null;
-let scores={p1:0,p2:0},names={p1:'',p2:''};
-let currentRound=0,currentQuestion=null;
-let timerInterval=null,timeLeft=TIMER_SECS;
-let answered=false,doubleActive=false;
-let skipUsed=false,doubleUsed=false,hintUsed=false;
-let questionQueue=[],lobbyPoll=null;
+// ══════════════════════════════════════
+// الثوابت والحالة
+// ══════════════════════════════════════
+const ROUNDS=10, SECS=25, PTS=10;
+let myName='', myRole='', roomCode='';
+let bc=null, poll=null, tInt=null;
+let scores={p1:0,p2:0}, names={p1:'',p2:''};
+let curRound=0, curQ=null;
+let answered=false, dblOn=false;
+let skipUsed=false, dblUsed=false, hintUsed=false;
+let qQueue=[];
 
-const QUESTIONS={
+// ══════════════════════════════════════
+// الأسئلة
+// ══════════════════════════════════════
+const Q={
   general:[
-    {q:"ما هي عاصمة المملكة العربية السعودية؟",type:"mc",choices:["جدة","مكة المكرمة","الرياض","المدينة المنورة"],answer:"الرياض"},
-    {q:"كم عدد أيام السنة الكبيسة؟",type:"mc",choices:["364","365","366","367"],answer:"366"},
-    {q:"ما هو أكبر محيط في العالم؟",type:"mc",choices:["الأطلسي","الهندي","القطبي","الهادئ"],answer:"الهادئ"},
-    {q:"كم عدد ألوان قوس قزح؟",type:"mc",choices:["5","6","7","8"],answer:"7"},
-    {q:"ما هي اللغة الأكثر انتشاراً في العالم؟",type:"mc",choices:["الإنجليزية","الإسبانية","الصينية","العربية"],answer:"الصينية"},
-    {q:"الذهب رمزه الكيميائي AU.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما هي أصغر دولة في العالم؟",type:"mc",choices:["موناكو","سان مارينو","ناورو","الفاتيكان"],answer:"الفاتيكان"},
-    {q:"الماء يغلي عند 100 درجة مئوية على مستوى سطح البحر.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"كم عدد قارات العالم؟",type:"mc",choices:["5","6","7","8"],answer:"7"},
-    {q:"الشمس نجم وليست كوكباً.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
+    {q:"ما هي عاصمة المملكة العربية السعودية؟",c:["جدة","مكة المكرمة","الرياض","المدينة المنورة"],a:"الرياض"},
+    {q:"كم عدد أيام السنة الكبيسة؟",c:["364","365","366","367"],a:"366"},
+    {q:"ما هو أكبر محيط في العالم؟",c:["الأطلسي","الهندي","القطبي","الهادئ"],a:"الهادئ"},
+    {q:"كم عدد ألوان قوس قزح؟",c:["5","6","7","8"],a:"7"},
+    {q:"الذهب رمزه الكيميائي AU.",c:["صح","خطأ"],a:"صح"},
+    {q:"ما هي أصغر دولة في العالم؟",c:["موناكو","سان مارينو","ناورو","الفاتيكان"],a:"الفاتيكان"},
+    {q:"كم عدد قارات العالم؟",c:["5","6","7","8"],a:"7"},
+    {q:"الشمس نجم وليست كوكباً.",c:["صح","خطأ"],a:"صح"},
+    {q:"ما هي اللغة الأكثر تحدثاً في العالم؟",c:["الإنجليزية","الإسبانية","الصينية","العربية"],a:"الصينية"},
+    {q:"الماء يغلي عند 100 درجة مئوية على مستوى سطح البحر.",c:["صح","خطأ"],a:"صح"},
   ],
   science:[
-    {q:"ما هو مركز الخلية الذي يحتوي على DNA؟",type:"mc",choices:["الميتوكوندريا","النواة","الجسم الجولجي","الريبوسوم"],answer:"النواة"},
-    {q:"ما هو الرمز الكيميائي للماء؟",type:"mc",choices:["HO","H2O","H3O","H2O2"],answer:"H2O"},
-    {q:"الضوء يسير أسرع من الصوت.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما هو العنصر الأول في الجدول الدوري؟",type:"mc",choices:["الهيليوم","الأكسجين","الهيدروجين","النيتروجين"],answer:"الهيدروجين"},
-    {q:"كم عدد أسنان الإنسان البالغ الكاملة؟",type:"mc",choices:["28","30","32","34"],answer:"32"},
-    {q:"الأرض تدور حول نفسها كل 24 ساعة تقريباً.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما أصلب مادة طبيعية في الطبيعة؟",type:"mc",choices:["الذهب","الكوارتز","الألماس","التنغستن"],answer:"الألماس"},
-    {q:"ما هو الغاز الأكثر وفرة في الغلاف الجوي للأرض؟",type:"mc",choices:["الأكسجين","ثاني أكسيد الكربون","الأرجون","النيتروجين"],answer:"النيتروجين"},
-    {q:"القمر له جاذبية أقل من الأرض.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"الميتوكوندريا تُعرف بـ'مصنع طاقة الخلية'.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
+    {q:"ما هو مركز الخلية الذي يحتوي على DNA؟",c:["الميتوكوندريا","النواة","الجسم الجولجي","الريبوسوم"],a:"النواة"},
+    {q:"الضوء يسير أسرع من الصوت.",c:["صح","خطأ"],a:"صح"},
+    {q:"ما هو العنصر الأول في الجدول الدوري؟",c:["الهيليوم","الأكسجين","الهيدروجين","النيتروجين"],a:"الهيدروجين"},
+    {q:"كم عدد أسنان الإنسان البالغ الكاملة؟",c:["28","30","32","34"],a:"32"},
+    {q:"ما أصلب مادة طبيعية في الطبيعة؟",c:["الذهب","الكوارتز","الألماس","التنغستن"],a:"الألماس"},
+    {q:"ما هو الغاز الأكثر وفرة في الغلاف الجوي؟",c:["الأكسجين","ثاني أكسيد الكربون","الأرجون","النيتروجين"],a:"النيتروجين"},
+    {q:"القمر له جاذبية أقل من الأرض.",c:["صح","خطأ"],a:"صح"},
+    {q:"الميتوكوندريا هي مصنع الطاقة في الخلية.",c:["صح","خطأ"],a:"صح"},
+    {q:"ما الرمز الكيميائي للذهب؟",c:["Go","Gd","Au","Ag"],a:"Au"},
+    {q:"الأرض تدور حول الشمس مرة كل سنة.",c:["صح","خطأ"],a:"صح"},
   ],
-  quran:[
-    {q:"كم عدد سور القرآن الكريم؟",type:"mc",choices:["110","114","116","120"],answer:"114"},
-    {q:"ما هي أول سورة في القرآن الكريم؟",type:"mc",choices:["البقرة","الفاتحة","آل عمران","الناس"],answer:"الفاتحة"},
-    {q:"ما هي أطول سورة في القرآن الكريم؟",type:"mc",choices:["آل عمران","النساء","البقرة","المائدة"],answer:"البقرة"},
-    {q:"القرآن الكريم نزل ابتداءً في شهر رمضان.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"كم عدد أجزاء القرآن الكريم؟",type:"mc",choices:["20","25","30","40"],answer:"30"},
-    {q:"ما اسم السورة التي تعادل ثلث القرآن؟",type:"mc",choices:["الفاتحة","الناس","الإخلاص","الكافرون"],answer:"الإخلاص"},
-    {q:"سورة الكهف يُستحب قراءتها يوم الجمعة.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"كم عدد آيات سورة الفاتحة؟",type:"mc",choices:["5","6","7","8"],answer:"7"},
-    {q:"آية الكرسي موجودة في سورة البقرة.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما هي أقصر سورة في القرآن الكريم؟",type:"mc",choices:["الناس","الفلق","الكوثر","العصر"],answer:"الكوثر"},
+  bible:[
+    {q:"كم عدد أسفار العهد القديم (البروتستانتي)؟",c:["36","39","42","45"],a:"39"},
+    {q:"من هو أول إنسان خُلق حسب سفر التكوين؟",c:["نوح","إبراهيم","آدم","موسى"],a:"آدم"},
+    {q:"في أي نهر تعمّد يسوع المسيح؟",c:["الفرات","النيل","الأردن","دجلة"],a:"الأردن"},
+    {q:"كم يوماً صام يسوع في البرية؟",c:["20 يوماً","30 يوماً","40 يوماً","50 يوماً"],a:"40 يوماً"},
+    {q:"من كتب أكثر رسائل العهد الجديد؟",c:["يوحنا","بطرس","بولس الرسول","لوقا"],a:"بولس الرسول"},
+    {q:"ما اسم المدينة التي وُلد فيها يسوع المسيح؟",c:["الناصرة","أورشليم","بيت لحم","بيت عنيا"],a:"بيت لحم"},
+    {q:"كم كان عدد تلاميذ يسوع المختارين؟",c:["10","11","12","13"],a:"12"},
+    {q:"من بنى سفينة النجاة في سفر التكوين؟",c:["إبراهيم","موسى","داود","نوح"],a:"نوح"},
+    {q:"ما هو أول معجزة ليسوع حسب إنجيل يوحنا؟",c:["إقامة لعازر","إطعام الخمسة آلاف","تحويل الماء إلى خمر","شفاء الأعمى"],a:"تحويل الماء إلى خمر"},
+    {q:"في أي سفر توجد قصة داود وجليات؟",c:["التكوين","المزامير","صموئيل الأول","الملوك الأول"],a:"صموئيل الأول"},
   ],
   history:[
-    {q:"في أي عام فُتحت القسطنطينية؟",type:"mc",choices:["1350","1453","1500","1600"],answer:"1453"},
-    {q:"من بنى الأهرامات المصرية؟",type:"mc",choices:["الرومان","الفينيقيون","الفراعنة","البابليون"],answer:"الفراعنة"},
-    {q:"الإسكندر الأكبر كان رومانياً.",type:"tf",choices:["صح","خطأ"],answer:"خطأ"},
-    {q:"الدولة العباسية اتخذت من بغداد عاصمةً لها.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"من هو أول خليفة للمسلمين بعد النبي ﷺ؟",type:"mc",choices:["عمر بن الخطاب","علي بن أبي طالب","أبو بكر الصديق","عثمان بن عفان"],answer:"أبو بكر الصديق"},
-    {q:"في أي عام انتهت الحرب العالمية الثانية؟",type:"mc",choices:["1943","1944","1945","1946"],answer:"1945"},
-    {q:"صلاح الدين الأيوبي كان أصله كردياً.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما هي الإمبراطورية التي حكمت العالم الإسلامي قرابة 600 عام؟",type:"mc",choices:["الأموية","الفاطمية","المغولية","العثمانية"],answer:"العثمانية"},
-    {q:"مدينة قرطاج القديمة كانت تقع في تونس.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"من هو الفاتح الذي فتح الأندلس؟",type:"mc",choices:["عقبة بن نافع","موسى بن نصير","طارق بن زياد","خالد بن الوليد"],answer:"طارق بن زياد"},
+    {q:"في أي عام فُتحت القسطنطينية؟",c:["1350","1453","1500","1600"],a:"1453"},
+    {q:"من بنى الأهرامات المصرية؟",c:["الرومان","الفينيقيون","الفراعنة","البابليون"],a:"الفراعنة"},
+    {q:"الإسكندر الأكبر كان رومانياً.",c:["صح","خطأ"],a:"خطأ"},
+    {q:"في أي عام انتهت الحرب العالمية الثانية؟",c:["1943","1944","1945","1946"],a:"1945"},
+    {q:"صلاح الدين الأيوبي كان أصله كردياً.",c:["صح","خطأ"],a:"صح"},
+    {q:"ما هي الإمبراطورية التي حكمت قرابة 600 عام؟",c:["الأموية","الفاطمية","المغولية","العثمانية"],a:"العثمانية"},
+    {q:"مدينة قرطاج القديمة كانت في تونس.",c:["صح","خطأ"],a:"صح"},
+    {q:"من فتح الأندلس؟",c:["عقبة بن نافع","موسى بن نصير","طارق بن زياد","خالد بن الوليد"],a:"طارق بن زياد"},
+    {q:"في أي عام سقطت الخلافة العثمانية؟",c:["1920","1922","1923","1924"],a:"1924"},
+    {q:"كريستوفر كولومبوس اكتشف أمريكا عام 1492.",c:["صح","خطأ"],a:"صح"},
   ],
   sports:[
-    {q:"كم عدد لاعبي كرة القدم من الفريقين معاً في الملعب؟",type:"mc",choices:["18","20","22","24"],answer:"22"},
-    {q:"كم عدد أطواق الشعار الأولمبي؟",type:"mc",choices:["4","5","6","7"],answer:"5"},
-    {q:"البرازيل هي أكثر دولة فازت بكأس العالم.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"محمد صلاح لاعب مصري.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"كم عدد لاعبي كرة السلة من فريق واحد في الملعب؟",type:"mc",choices:["4","5","6","7"],answer:"5"},
-    {q:"أول كأس عالم لكرة القدم أُقيم في الأوروغواي عام 1930.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"من فاز بكأس العالم 2022 في قطر؟",type:"mc",choices:["فرنسا","البرازيل","الأرجنتين","ألمانيا"],answer:"الأرجنتين"},
-    {q:"رياضة التنس تُقام بطولتها الكبرى في ويمبلدون.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما اسم بطولة كرة القدم الأفريقية؟",type:"mc",choices:["كأس أمم آسيا","كأس أمم أفريقيا","كأس الاتحاد الأفريقي","دوري أبطال أفريقيا"],answer:"كأس أمم أفريقيا"},
-    {q:"المملكة العربية السعودية فازت على الأرجنتين في كأس العالم 2022.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
+    {q:"كم عدد لاعبي كرة القدم من الفريقين في الملعب؟",c:["18","20","22","24"],a:"22"},
+    {q:"كم عدد أطواق الشعار الأولمبي؟",c:["4","5","6","7"],a:"5"},
+    {q:"البرازيل أكثر دولة فازت بكأس العالم.",c:["صح","خطأ"],a:"صح"},
+    {q:"محمد صلاح لاعب مصري.",c:["صح","خطأ"],a:"صح"},
+    {q:"كم عدد لاعبي كرة السلة لفريق واحد في الملعب؟",c:["4","5","6","7"],a:"5"},
+    {q:"من فاز بكأس العالم 2022 في قطر؟",c:["فرنسا","البرازيل","الأرجنتين","ألمانيا"],a:"الأرجنتين"},
+    {q:"رياضة التنس تُقام بطولتها الكبرى في ويمبلدون.",c:["صح","خطأ"],a:"صح"},
+    {q:"السعودية فازت على الأرجنتين في كأس العالم 2022.",c:["صح","خطأ"],a:"صح"},
+    {q:"مصر فازت بكأس أمم أفريقيا أكثر من أي دولة.",c:["صح","خطأ"],a:"صح"},
+    {q:"عدد أشواط كرة القدم الرسمية 2.",c:["صح","خطأ"],a:"صح"},
   ],
   arab:[
-    {q:"ما هي أكبر دولة عربية من حيث المساحة؟",type:"mc",choices:["السعودية","الجزائر","السودان","ليبيا"],answer:"الجزائر"},
-    {q:"أي مدينة عربية تُعرف بـ'مدينة الألف مئذنة'؟",type:"mc",choices:["القاهرة","بغداد","دمشق","فاس"],answer:"القاهرة"},
-    {q:"نهر النيل أطول نهر في العالم.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"جبل طارق سُمي على اسم الفاتح طارق بن زياد.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما هي العملة المستخدمة في مصر؟",type:"mc",choices:["الدينار","الريال","الجنيه","الدرهم"],answer:"الجنيه"},
-    {q:"دولة الإمارات العربية المتحدة تتكون من كم إمارة؟",type:"mc",choices:["5","6","7","8"],answer:"7"},
-    {q:"البتراء الأثرية تقع في الأردن.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما هي أقدم عاصمة عربية مأهولة حتى اليوم؟",type:"mc",choices:["القاهرة","بغداد","دمشق","عمّان"],answer:"دمشق"},
-    {q:"صحراء الربع الخالي أكبر صحراء رملية متواصلة في العالم.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما هي عاصمة المغرب؟",type:"mc",choices:["الدار البيضاء","مراكش","فاس","الرباط"],answer:"الرباط"},
+    {q:"ما هي أكبر دولة عربية مساحةً؟",c:["السعودية","الجزائر","السودان","ليبيا"],a:"الجزائر"},
+    {q:"أي مدينة تُعرف بـ'مدينة الألف مئذنة'؟",c:["القاهرة","بغداد","دمشق","فاس"],a:"القاهرة"},
+    {q:"نهر النيل أطول نهر في العالم.",c:["صح","خطأ"],a:"صح"},
+    {q:"ما العملة المستخدمة في مصر؟",c:["الدينار","الريال","الجنيه","الدرهم"],a:"الجنيه"},
+    {q:"الإمارات تتكون من كم إمارة؟",c:["5","6","7","8"],a:"7"},
+    {q:"البتراء تقع في الأردن.",c:["صح","خطأ"],a:"صح"},
+    {q:"ما هي أقدم عاصمة عربية مأهولة؟",c:["القاهرة","بغداد","دمشق","عمّان"],a:"دمشق"},
+    {q:"صحراء الربع الخالي أكبر صحراء رملية متواصلة.",c:["صح","خطأ"],a:"صح"},
+    {q:"ما هي عاصمة المغرب؟",c:["الدار البيضاء","مراكش","فاس","الرباط"],a:"الرباط"},
+    {q:"جبل طارق سُمّي على اسم طارق بن زياد.",c:["صح","خطأ"],a:"صح"},
   ],
   movies:[
-    {q:"من أخرج فيلم Inception؟",type:"mc",choices:["ستيفن سبيلبرغ","جيمس كاميرون","كريستوفر نولان","ريدلي سكوت"],answer:"كريستوفر نولان"},
-    {q:"فيلم 'الرسالة' للمخرج مصطفى العقاد يتحدث عن نشأة الإسلام.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"من يلعب دور Iron Man في أفلام Marvel؟",type:"mc",choices:["كريس إيفانس","كريس هيمسورث","روبرت داوني جونيور","مارك رافالو"],answer:"روبرت داوني جونيور"},
-    {q:"مسلسل 'باب الحارة' سوري الإنتاج.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"فيلم Titanic مبني على قصة حقيقية.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما الفيلم الذي فاز بأوسكار أفضل فيلم عام 2020؟",type:"mc",choices:["Parasite","1917","Joker","Ford v Ferrari"],answer:"Parasite"},
-    {q:"الممثل الراحل عمر الشريف مصري الجنسية.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"في أي فيلم تظهر جملة 'Why so serious?'؟",type:"mc",choices:["Batman Begins","The Dark Knight","Joker","Batman v Superman"],answer:"The Dark Knight"},
-    {q:"أفاتار (2009) أعلى فيلم إيراداً في تاريخ السينما.",type:"tf",choices:["صح","خطأ"],answer:"صح"},
-    {q:"ما جنسية مخرج فيلم Parasite الحائز على أوسكار؟",type:"mc",choices:["يابانية","صينية","كورية","تايوانية"],answer:"كورية"},
+    {q:"من أخرج فيلم Inception؟",c:["ستيفن سبيلبرغ","جيمس كاميرون","كريستوفر نولان","ريدلي سكوت"],a:"كريستوفر نولان"},
+    {q:"فيلم 'الرسالة' يتحدث عن نشأة الإسلام.",c:["صح","خطأ"],a:"صح"},
+    {q:"من يلعب دور Iron Man في Marvel؟",c:["كريس إيفانس","كريس هيمسورث","روبرت داوني جونيور","مارك رافالو"],a:"روبرت داوني جونيور"},
+    {q:"مسلسل باب الحارة سوري الإنتاج.",c:["صح","خطأ"],a:"صح"},
+    {q:"فيلم Titanic مبني على قصة حقيقية.",c:["صح","خطأ"],a:"صح"},
+    {q:"أفضل فيلم أوسكار 2020 كان Parasite.",c:["صح","خطأ"],a:"صح"},
+    {q:"الممثل عمر الشريف مصري الجنسية.",c:["صح","خطأ"],a:"صح"},
+    {q:"'Why so serious?' من فيلم The Dark Knight.",c:["صح","خطأ"],a:"صح"},
+    {q:"أفاتار 2009 أعلى فيلم إيراداً في التاريخ.",c:["صح","خطأ"],a:"صح"},
+    {q:"مخرج فيلم Parasite كوري الجنسية.",c:["صح","خطأ"],a:"صح"},
   ]
 };
 
-// ── أدوات ──────────────────────────────────────────────────
-function gLS(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}}
-function sLS(k,v){localStorage.setItem(k,JSON.stringify(v))}
-function rLS(k){localStorage.removeItem(k)}
+const LABELS={
+  general:'🌍 معلومات عامة',science:'🔬 علوم',bible:'✝️ الكتاب المقدس',
+  history:'📜 تاريخ',sports:'⚽ رياضة',arab:'🗺️ وطن عربي',movies:'🎬 أفلام'
+};
 
+// ══════════════════════════════════════
+// localStorage
+// ══════════════════════════════════════
+const gLS=k=>{try{return JSON.parse(localStorage.getItem(k))}catch{return null}};
+const sLS=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const rLS=k=>localStorage.removeItem(k);
+
+// ══════════════════════════════════════
+// واجهة
+// ══════════════════════════════════════
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
 }
-
-function showNotif(msg,type='info',dur=3000){
+function notif(msg,t='info',d=3000){
   document.querySelectorAll('.notif').forEach(n=>n.remove());
   const el=document.createElement('div');
-  el.className=`notif ${type}`;el.textContent=msg;
+  el.className=`notif ${t}`;el.textContent=msg;
   document.body.appendChild(el);
-  setTimeout(()=>el.remove(),dur);
+  setTimeout(()=>el.remove(),d);
 }
 
-// ── تنسيق حقل الكود ────────────────────────────────────────
-// هذا هو الإصلاح الرئيسي — يحول الكود لأحرف كبيرة فوراً عند الكتابة
-function formatCode(el){
-  const start=el.selectionStart;
-  // نحول لكبير ونحذف أي حرف غير مسموح به
-  el.value=el.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
-  try{el.setSelectionRange(start,start)}catch(e){}
+// ══════════════════════════════════════
+// تنظيف حقل الكود — الإصلاح الجوهري
+// ══════════════════════════════════════
+function cleanCode(el){
+  // احتفظ بموضع المؤشر
+  const pos=el.selectionStart;
+  // احذف كل ما ليس حرفاً إنجليزياً أو رقماً ثم حوّل لكبير
+  const clean=el.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,6);
+  el.value=clean;
+  try{el.setSelectionRange(Math.min(pos,clean.length),Math.min(pos,clean.length))}catch(e){}
 }
-
-function handlePaste(e){
+function onPaste(e){
   e.preventDefault();
-  const pasted=(e.clipboardData||window.clipboardData).getData('text');
-  const clean=pasted.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
-  document.getElementById('join-code').value=clean;
+  const raw=(e.clipboardData||window.clipboardData).getData('text');
+  document.getElementById('join-code').value=
+    raw.replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,6);
 }
 
-// ── إنشاء الغرفة ───────────────────────────────────────────
+// بدون أحرف مشابهة بصرياً (O,0,I,1,S,5)
+function genCode(){
+  const pool='ABCDEFGHJKLMNPQRTUVWXYZ2346789';
+  return Array.from({length:6},()=>pool[Math.floor(Math.random()*pool.length)]).join('');
+}
+function shuffle(a){return a.sort(()=>Math.random()-.5)}
+
+// ══════════════════════════════════════
+// إنشاء الغرفة
+// ══════════════════════════════════════
 function createRoom(){
   myName=document.getElementById('player-name').value.trim();
-  if(!myName){showNotif('أدخل اسمك أولاً!','error');return;}
-  roomCode=generateCode();
+  if(!myName){notif('أدخل اسمك أولاً!','error');return;}
+  roomCode=genCode();
   myRole='host';
-  const cat=document.getElementById('category-select').value;
-  sLS('room_'+roomCode,{code:roomCode,category:cat,host:myName,guest:null,status:'waiting',timestamp:Date.now()});
+  const cat=document.getElementById('cat-sel').value;
+  sLS('room_'+roomCode,{code:roomCode,cat,host:myName,guest:null,status:'waiting',ts:Date.now()});
   initBC();
   showLobby();
 }
 
-// ── الانضمام (الإصلاح الرئيسي) ────────────────────────────
+// ══════════════════════════════════════
+// الانضمام — الإصلاح الجوهري
+// ══════════════════════════════════════
 function joinRoom(){
   myName=document.getElementById('player-name').value.trim();
-  if(!myName){showNotif('أدخل اسمك أولاً!','error');return;}
+  if(!myName){notif('أدخل اسمك أولاً!','error');return;}
 
-  // ننظف الكود بشكل قاطع ونحوله لأحرف كبيرة
+  // تنظيف مضاعف للكود
   const raw=document.getElementById('join-code').value||'';
-  const code=raw.trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const code=raw.replace(/[^A-Za-z0-9]/g,'').toUpperCase();
 
-  if(code.length===0){showNotif('أدخل كود الغرفة!','error');return;}
-  if(code.length!==6){showNotif(`الكود "${code}" يجب أن يكون 6 أحرف — أنت أدخلت ${code.length}`,'error',4000);return;}
+  if(!code){notif('أدخل كود الغرفة!','error');return;}
+  if(code.length!==6){
+    notif(`الكود يجب أن يكون 6 أحرف — أنت أدخلت ${code.length}`,'error',4000);
+    return;
+  }
 
   const room=gLS('room_'+code);
   if(!room){
-    showNotif(`الغرفة "${code}" غير موجودة — تأكد من الكود`,'error',4000);
+    notif(`لم يُعثر على غرفة "${code}"  — تأكد أن التبويب الآخر مفتوح ومُنشئ الغرفة`,'error',5000);
     return;
   }
-  if(room.guest){showNotif('الغرفة ممتلئة!','error');return;}
-  if(room.host===myName){showNotif('لا تستطيع الانضمام لغرفتك أنت!','error');return;}
+  if(room.guest){notif('الغرفة ممتلئة!','error');return;}
+  if(room.host===myName){notif('استخدم اسماً مختلفاً عن المضيف!','error');return;}
 
   room.guest=myName; room.status='ready';
   sLS('room_'+code,room);
   roomCode=code; myRole='guest';
   names.p1=room.host; names.p2=myName;
   initBC();
-  bc.postMessage({type:'guest_joined',name:myName});
+  // أرسل عبر BroadcastChannel
+  bc.postMessage({t:'joined',name:myName});
   showLobby();
 }
 
-function generateCode(){
-  // بدون أحرف مشابهة مثل O/0 و I/1
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let c='';
-  for(let i=0;i<6;i++) c+=chars[Math.floor(Math.random()*chars.length)];
-  return c;
-}
-
-// ── BroadcastChannel ───────────────────────────────────────
+// ══════════════════════════════════════
+// BroadcastChannel
+// ══════════════════════════════════════
 function initBC(){
   if(bc){try{bc.close()}catch(e){}}
-  bc=new BroadcastChannel('quizduel_'+roomCode);
-  bc.onmessage=handleMsg;
+  bc=new BroadcastChannel('qd_'+roomCode);
+  bc.onmessage=onMsg;
 }
 
-function handleMsg(e){
+function onMsg(e){
   const m=e.data;
-  if(m.type==='guest_joined'){
+  if(m.t==='joined'){
     names.p1=myName; names.p2=m.name;
-    document.getElementById('p2-lobby-name').textContent=m.name;
-    document.getElementById('p2-lobby-status').className='status-dot dot-ready';
-    document.getElementById('start-btn-wrap').style.display='block';
-    document.getElementById('lobby-status-msg').style.display='none';
+    document.getElementById('p2-name').textContent=m.name;
+    document.getElementById('p2-dot').className='status-dot dot-ready';
+    document.getElementById('start-wrap').style.display='block';
+    document.getElementById('lobby-msg').style.display='none';
   }
-  if(m.type==='game_start'){
-    names=m.names; scores={p1:0,p2:0}; currentRound=0;
-    questionQueue=[...m.questions];
-    startGameUI();
+  if(m.t==='start'){
+    names=m.names; scores={p1:0,p2:0}; curRound=0;
+    qQueue=[...m.qs];
+    startUI();
   }
-  if(m.type==='next_question'){
-    currentQuestion=m.question; currentRound=m.round;
-    answered=false; doubleActive=false;
+  if(m.t==='question'){
+    curQ=m.q; curRound=m.round;
+    answered=false; dblOn=false;
     renderQ(); startTimer();
   }
-  if(m.type==='answer_result'){
-    scores=m.scores; updateBoard();
-    revealAns(m.correctAnswer);
-    if(m.gameOver) setTimeout(showResult,2500);
-    else if(myRole==='host') setTimeout(loadNext,3000);
+  if(m.t==='result'){
+    scores=m.scores; updateBoard(); revealAns(m.ans);
+    if(m.over) setTimeout(showResult,2500);
+    else if(myRole==='host') setTimeout(nextQ,3000);
   }
-  if(m.type==='chat') addChat(m.text,m.from===myName?'me':'them',m.from);
-  if(m.type==='reaction') addChat(m.emoji,'system',m.from);
-  if(m.type==='powerup'){
-    if(m.pu==='skip'&&myRole==='host'){clearInterval(timerInterval);loadNext();}
+  if(m.t==='chat') addChat(m.txt,m.from===myName?'me':'them',m.from);
+  if(m.t==='react') addChat(m.e,'system',m.from);
+  if(m.t==='pu'){
+    if(m.pu==='skip'&&myRole==='host'){clearInterval(tInt);nextQ();}
     if(m.pu==='hint') applyHint();
-    addChat(`${m.from} استخدم ${{skip:'⏭ تخطي',double:'⚡ ×2',hint:'💡 50/50'}[m.pu]}!`,'system','');
+    addChat(`${m.from} استخدم ${{skip:'⏭',double:'⚡',hint:'💡'}[m.pu]}!`,'system','');
   }
 }
 
-// ── Lobby ───────────────────────────────────────────────────
+// ══════════════════════════════════════
+// Lobby
+// ══════════════════════════════════════
 function showLobby(){
-  if(lobbyPoll) clearInterval(lobbyPoll);
+  clearInterval(poll);
   showScreen('lobby');
   document.getElementById('room-code-display').textContent=roomCode;
-  document.getElementById('p1-lobby-name').textContent=myRole==='host'?myName:(gLS('room_'+roomCode)?.host||'—');
-  document.getElementById('p1-lobby-status').className='status-dot dot-ready';
+  document.getElementById('p1-name').textContent=myRole==='host'?myName:(gLS('room_'+roomCode)?.host||'—');
+  document.getElementById('p1-dot').className='status-dot dot-ready';
+
   if(myRole==='guest'){
-    document.getElementById('p2-lobby-name').textContent=myName;
-    document.getElementById('p2-lobby-status').className='status-dot dot-ready';
-    document.getElementById('lobby-status-msg').innerHTML='✅ متصل! في انتظار المضيف...';
+    document.getElementById('p2-name').textContent=myName;
+    document.getElementById('p2-dot').className='status-dot dot-ready';
+    document.getElementById('lobby-msg').textContent='✅ متصل! في انتظار المضيف...';
   }
+
+  // Polling كـ fallback لـ BroadcastChannel
   if(myRole==='host'){
-    lobbyPoll=setInterval(()=>{
+    poll=setInterval(()=>{
       const r=gLS('room_'+roomCode);
-      if(r&&r.guest){
-        clearInterval(lobbyPoll);
+      if(r&&r.guest&&document.getElementById('start-wrap').style.display==='none'){
+        clearInterval(poll);
         names.p1=r.host; names.p2=r.guest;
-        document.getElementById('p2-lobby-name').textContent=r.guest;
-        document.getElementById('p2-lobby-status').className='status-dot dot-ready';
-        document.getElementById('start-btn-wrap').style.display='block';
-        document.getElementById('lobby-status-msg').style.display='none';
+        document.getElementById('p2-name').textContent=r.guest;
+        document.getElementById('p2-dot').className='status-dot dot-ready';
+        document.getElementById('start-wrap').style.display='block';
+        document.getElementById('lobby-msg').style.display='none';
       }
-    },800);
+    },500);
   }
 }
 
 function copyCode(){
-  const fallback=()=>{
-    const ta=document.createElement('textarea');
-    ta.value=roomCode; ta.style.cssText='position:fixed;opacity:0';
-    document.body.appendChild(ta); ta.select();
-    try{document.execCommand('copy');showNotif('✅ تم نسخ الكود: '+roomCode,'success');}
-    catch(e){showNotif('الكود: '+roomCode,'info',5000);}
-    document.body.removeChild(ta);
+  const fb=()=>{
+    try{
+      const t=document.createElement('textarea');
+      t.value=roomCode; t.style.cssText='position:fixed;opacity:0';
+      document.body.appendChild(t); t.select();
+      document.execCommand('copy');
+      document.body.removeChild(t);
+      notif('✅ تم النسخ: '+roomCode,'success');
+    }catch{notif('الكود: '+roomCode,'info',6000);}
   };
   if(navigator.clipboard){
     navigator.clipboard.writeText(roomCode)
-      .then(()=>showNotif('✅ تم نسخ الكود: '+roomCode,'success'))
-      .catch(fallback);
-  } else fallback();
+      .then(()=>notif('✅ تم النسخ: '+roomCode,'success'))
+      .catch(fb);
+  }else fb();
 }
 
 function leaveRoom(){
-  if(lobbyPoll) clearInterval(lobbyPoll);
+  clearInterval(poll); clearInterval(tInt);
   if(bc){try{bc.close()}catch(e){}} bc=null;
   rLS('room_'+roomCode);
   roomCode=''; myRole='';
   showScreen('home');
 }
 
-// ── اللعبة ─────────────────────────────────────────────────
-function getCatLabel(cat){
-  return {general:'🌍 معلومات عامة',science:'🔬 علوم',quran:'📖 قرآن',
-    history:'📜 تاريخ',sports:'⚽ رياضة',arab:'🗺️ وطن عربي',movies:'🎬 أفلام'}[cat]||'معلومات';
-}
-
-function getQs(cat){
-  return [...(QUESTIONS[cat]||QUESTIONS.general)].sort(()=>Math.random()-.5).slice(0,TOTAL_ROUNDS);
-}
-
+// ══════════════════════════════════════
+// اللعبة
+// ══════════════════════════════════════
 function startGame(){
-  if(lobbyPoll) clearInterval(lobbyPoll);
+  clearInterval(poll);
   const room=gLS('room_'+roomCode);
   names.p1=room.host; names.p2=room.guest;
-  scores={p1:0,p2:0}; currentRound=0;
-  const qs=getQs(room.category);
-  questionQueue=[...qs];
-  bc.postMessage({type:'game_start',names,questions:qs});
-  startGameUI();
+  scores={p1:0,p2:0}; curRound=0;
+  const qs=shuffle([...(Q[room.cat]||Q.general)]).slice(0,ROUNDS);
+  qQueue=[...qs];
+  bc.postMessage({t:'start',names,qs});
+  startUI();
 }
 
-function startGameUI(){
+function startUI(){
   showScreen('game');
   updateBoard();
-  skipUsed=false; doubleUsed=false; hintUsed=false; doubleActive=false;
-  ['skip','double','hint'].forEach(p=>{
-    const b=document.getElementById('pu-'+p);
+  skipUsed=false; dblUsed=false; hintUsed=false; dblOn=false;
+  ['skip','double','hint'].forEach(id=>{
+    const b=document.getElementById('pu-'+id);
     b.disabled=false; b.classList.remove('used');
   });
   document.getElementById('chat-msgs').innerHTML='';
-  if(myRole==='host') loadNext();
+  if(myRole==='host') nextQ();
 }
 
-function loadNext(){
-  if(questionQueue.length===0){
-    bc.postMessage({type:'answer_result',correct:false,correctAnswer:'',answerer:'',scores,gameOver:true});
+function nextQ(){
+  if(!qQueue.length){
+    bc.postMessage({t:'result',scores,ans:'',over:true});
     showResult(); return;
   }
-  currentRound++;
-  currentQuestion=questionQueue.shift();
-  answered=false; doubleActive=false;
-  bc.postMessage({type:'next_question',question:currentQuestion,round:currentRound});
+  curRound++;
+  curQ=qQueue.shift();
+  answered=false; dblOn=false;
+  bc.postMessage({t:'question',q:curQ,round:curRound});
   renderQ(); startTimer();
 }
 
 function renderQ(){
-  if(!currentQuestion) return;
+  if(!curQ) return;
   const room=gLS('room_'+roomCode);
-  document.getElementById('q-cat').textContent=getCatLabel(room?.category||'general');
-  document.getElementById('q-badge').textContent=currentQuestion.type==='tf'?'✅ صح أم خطأ':'🔤 اختيار من متعدد';
-  document.getElementById('q-text').textContent=currentQuestion.q;
-  document.getElementById('round-counter').textContent=`${currentRound}/${TOTAL_ROUNDS}`;
-  document.getElementById('turn-text').textContent='🎯 اختر إجابتك!';
+  document.getElementById('q-cat').textContent=LABELS[room?.cat||'general'];
+  document.getElementById('q-badge').textContent=curQ.c.length===2?'✅ صح أم خطأ':'🔤 اختيار من متعدد';
+  document.getElementById('q-text').textContent=curQ.q;
+  document.getElementById('round-disp').textContent=`${curRound}/${ROUNDS}`;
+  document.getElementById('turn-txt').textContent='🎯 اختر إجابتك!';
   document.getElementById('score-p1').classList.toggle('active-player',myRole==='host');
   document.getElementById('score-p2').classList.toggle('active-player',myRole==='guest');
 
-  const div=document.getElementById('q-answers');
-  div.innerHTML='';
-  const grid=document.createElement('div');
-  grid.className='choices';
-  currentQuestion.choices.forEach((ch,i)=>{
-    const btn=document.createElement('button');
-    btn.className='choice-btn'; btn.textContent=ch; btn.id='ch'+i;
-    btn.onclick=()=>submitAnswer(ch);
-    grid.appendChild(btn);
+  const div=document.getElementById('q-ans'); div.innerHTML='';
+  const grid=document.createElement('div'); grid.className='choices';
+  curQ.c.forEach((ch,i)=>{
+    const b=document.createElement('button');
+    b.className='choice-btn'; b.textContent=ch; b.id='ch'+i;
+    b.onclick=()=>pick(ch);
+    grid.appendChild(b);
   });
   div.appendChild(grid);
 }
 
-function submitAnswer(ans){
+function pick(ans){
   if(answered) return;
   answered=true;
-  clearInterval(timerInterval);
-  const ok=ans===currentQuestion.answer;
-  const pts=ok?(doubleActive?PTS_CORRECT*2:PTS_CORRECT):0;
+  clearInterval(tInt);
+  const ok=ans===curQ.a;
+  const pts=ok?(dblOn?PTS*2:PTS):0;
   if(myRole==='host') scores.p1+=pts; else scores.p2+=pts;
-  disableChoices();
-  playSound(ok?'correct':'wrong');
-  showNotif(ok?`✅ إجابة صحيحة! +${pts}`:'❌ إجابة خاطئة!',ok?'success':'error');
-  const over=currentRound>=TOTAL_ROUNDS&&questionQueue.length===0;
-  bc.postMessage({type:'answer_result',correct:ok,correctAnswer:currentQuestion.answer,answerer:myName,scores,gameOver:over});
-  revealAns(currentQuestion.answer);
-  if(!over){if(myRole==='host') setTimeout(loadNext,3000);}
+  disableC();
+  sound(ok?'y':'n');
+  notif(ok?`✅ صحيح! +${pts} نقطة`:'❌ خطأ!',ok?'success':'error');
+  const over=curRound>=ROUNDS&&!qQueue.length;
+  bc.postMessage({t:'result',scores,ans:curQ.a,over});
+  revealAns(curQ.a);
+  if(!over){if(myRole==='host') setTimeout(nextQ,3000);}
   else setTimeout(showResult,2500);
 }
 
-function disableChoices(){document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);}
+function disableC(){document.querySelectorAll('.choice-btn').forEach(b=>b.disabled=true);}
 
-function revealAns(correctAnswer){
-  disableChoices();
+function revealAns(a){
+  disableC();
   document.querySelectorAll('.choice-btn').forEach(b=>{
-    if(b.textContent===correctAnswer) b.classList.add('correct');
+    if(b.textContent===a) b.classList.add('correct');
   });
   updateBoard();
 }
 
 function startTimer(){
-  clearInterval(timerInterval);
-  timeLeft=TIMER_SECS;
-  const bar=document.getElementById('timer-bar'), num=document.getElementById('timer-num');
-  bar.style.width='100%'; bar.className='timer-bar'; num.textContent=timeLeft;
-  timerInterval=setInterval(()=>{
-    timeLeft--;
-    bar.style.width=(timeLeft/TIMER_SECS*100)+'%';
-    num.textContent=timeLeft;
-    if(timeLeft<=8) bar.className='timer-bar danger';
-    else if(timeLeft<=15) bar.className='timer-bar warn';
-    if(timeLeft<=0){
-      clearInterval(timerInterval);
+  clearInterval(tInt);
+  let t=SECS;
+  const bar=document.getElementById('t-bar'), num=document.getElementById('t-num');
+  bar.style.width='100%'; bar.className='timer-bar'; num.textContent=t;
+  tInt=setInterval(()=>{
+    t--;
+    bar.style.width=(t/SECS*100)+'%'; num.textContent=t;
+    if(t<=8) bar.className='timer-bar danger';
+    else if(t<=15) bar.className='timer-bar warn';
+    if(t<=0){
+      clearInterval(tInt);
       if(!answered){
-        answered=true; disableChoices();
-        showNotif('⏰ انتهى الوقت!','error');
-        playSound('wrong');
-        const over=currentRound>=TOTAL_ROUNDS&&questionQueue.length===0;
-        bc.postMessage({type:'answer_result',correct:false,correctAnswer:currentQuestion?.answer||'',answerer:'',scores,gameOver:over});
-        revealAns(currentQuestion?.answer||'');
-        if(!over&&myRole==='host') setTimeout(loadNext,3000);
+        answered=true; disableC();
+        notif('⏰ انتهى الوقت!','error'); sound('n');
+        const over=curRound>=ROUNDS&&!qQueue.length;
+        bc.postMessage({t:'result',scores,ans:curQ?.a||'',over});
+        revealAns(curQ?.a||'');
+        if(!over&&myRole==='host') setTimeout(nextQ,3000);
         else if(over) setTimeout(showResult,2500);
       }
     }
@@ -692,135 +687,134 @@ function updateBoard(){
   document.getElementById('sname2').textContent=names.p2||'اللاعب 2';
   const e1=document.getElementById('spts1'), e2=document.getElementById('spts2');
   e1.textContent=scores.p1; e2.textContent=scores.p2;
-  e1.className='p-pts '+(scores.p1>=scores.p2?'pts-green':'pts-red');
-  e2.className='p-pts '+(scores.p2>=scores.p1?'pts-green':'pts-red');
+  e1.className='p-pts '+(scores.p1>=scores.p2?'g':'r');
+  e2.className='p-pts '+(scores.p2>=scores.p1?'g':'r');
 }
 
-// ── القدرات ────────────────────────────────────────────────
+// ══════════════════════════════════════
+// القدرات
+// ══════════════════════════════════════
 function useSkip(){
   if(skipUsed||answered) return;
   skipUsed=true;
-  document.getElementById('pu-skip').disabled=true;
-  document.getElementById('pu-skip').classList.add('used');
-  bc.postMessage({type:'powerup',pu:'skip',from:myName});
-  clearInterval(timerInterval);
-  if(myRole==='host') loadNext();
+  const b=document.getElementById('pu-skip'); b.disabled=true; b.classList.add('used');
+  bc.postMessage({t:'pu',pu:'skip',from:myName});
+  clearInterval(tInt);
+  if(myRole==='host') nextQ();
 }
 function useDouble(){
-  if(doubleUsed||answered) return;
-  doubleUsed=true; doubleActive=true;
-  document.getElementById('pu-double').disabled=true;
-  document.getElementById('pu-double').classList.add('used');
-  bc.postMessage({type:'powerup',pu:'double',from:myName});
-  showNotif('⚡ نقاط مضاعفة!','info');
+  if(dblUsed||answered) return;
+  dblUsed=true; dblOn=true;
+  const b=document.getElementById('pu-double'); b.disabled=true; b.classList.add('used');
+  bc.postMessage({t:'pu',pu:'double',from:myName});
+  notif('⚡ نقاط مضاعفة!','info');
 }
 function useHint(){
   if(hintUsed||answered) return;
   hintUsed=true;
-  document.getElementById('pu-hint').disabled=true;
-  document.getElementById('pu-hint').classList.add('used');
-  bc.postMessage({type:'powerup',pu:'hint',from:myName});
+  const b=document.getElementById('pu-hint'); b.disabled=true; b.classList.add('used');
+  bc.postMessage({t:'pu',pu:'hint',from:myName});
   applyHint();
 }
 function applyHint(){
-  const wrong=Array.from(document.querySelectorAll('.choice-btn'))
-    .filter(b=>b.textContent!==currentQuestion?.answer&&!b.disabled);
-  wrong.sort(()=>Math.random()-.5).slice(0,Math.floor(wrong.length/2))
-    .forEach(b=>{b.disabled=true;b.style.opacity='.2';});
-  showNotif('💡 تم حذف إجابتين خاطئتين!','info');
+  const btns=Array.from(document.querySelectorAll('.choice-btn'))
+    .filter(b=>b.textContent!==curQ?.a&&!b.disabled);
+  shuffle(btns).slice(0,Math.floor(btns.length/2))
+    .forEach(b=>{b.disabled=true;b.style.opacity='.12';});
+  notif('💡 تم حذف إجابتين خاطئتين!','info');
 }
 
-// ── الدردشة ────────────────────────────────────────────────
+// ══════════════════════════════════════
+// الدردشة
+// ══════════════════════════════════════
 function sendChat(){
-  const inp=document.getElementById('chat-input');
-  const text=inp.value.trim(); if(!text) return;
+  const inp=document.getElementById('chat-in');
+  const txt=inp.value.trim(); if(!txt) return;
   inp.value='';
-  bc.postMessage({type:'chat',text,from:myName});
-  addChat(text,'me',myName);
+  bc.postMessage({t:'chat',txt,from:myName});
+  addChat(txt,'me',myName);
 }
-function sendReaction(emoji){
-  bc.postMessage({type:'reaction',emoji,from:myName});
-  addChat(emoji+' (أنت)','system','');
+function react(e){
+  bc.postMessage({t:'react',e,from:myName});
+  addChat(e+' (أنت)','system','');
 }
-function addChat(text,cls,from){
+function addChat(txt,cls,from){
   const msgs=document.getElementById('chat-msgs');
   const d=document.createElement('div');
   d.className='chat-msg '+cls;
-  d.textContent=cls==='system'?(from?`${from}: ${text}`:text):text;
+  d.textContent=cls==='system'?(from?`${from}: ${txt}`:txt):txt;
   msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
 }
 
-// ── النتيجة ────────────────────────────────────────────────
+// ══════════════════════════════════════
+// النتيجة
+// ══════════════════════════════════════
 function showResult(){
-  clearInterval(timerInterval);
-  document.getElementById('result-overlay').style.display='flex';
+  clearInterval(tInt);
+  document.getElementById('result-ov').style.display='flex';
   const myS=myRole==='host'?scores.p1:scores.p2;
   const thS=myRole==='host'?scores.p2:scores.p1;
-  const tied=scores.p1===scores.p2, iWin=myS>thS;
-  document.getElementById('res-emoji').textContent=tied?'🤝':iWin?'🏆':'😢';
-  document.getElementById('res-title').textContent=tied?'تعادل!':iWin?'أنت الفائز! 🎉':'خسرت هذه المرة!';
-  document.getElementById('res-sub').textContent=tied?'لعبة متكافئة!':iWin?`أحسنت! حصلت على ${myS} نقطة`:`المنافس حصل على ${thS} نقطة`;
-  document.getElementById('rf-name1').textContent=names.p1;
-  document.getElementById('rf-name2').textContent=names.p2;
-  document.getElementById('rf-score1').textContent=scores.p1;
-  document.getElementById('rf-score2').textContent=scores.p2;
-  document.getElementById('rf-score1').className='sf-score'+(scores.p1>=scores.p2?' winner':'');
-  document.getElementById('rf-score2').className='sf-score'+(scores.p2>=scores.p1?' winner':'');
-  playSound(iWin?'win':'lose');
+  const tied=scores.p1===scores.p2, win=myS>thS;
+  document.getElementById('res-em').textContent=tied?'🤝':win?'🏆':'😢';
+  document.getElementById('res-ti').textContent=tied?'تعادل!':win?'أنت الفائز! 🎉':'خسرت هذه المرة!';
+  document.getElementById('res-su').textContent=tied?'لعبة متكافئة!':win?`رائع! ${myS} نقطة`:`المنافس أحرز ${thS} نقطة`;
+  document.getElementById('rf-n1').textContent=names.p1;
+  document.getElementById('rf-n2').textContent=names.p2;
+  document.getElementById('rf-s1').textContent=scores.p1;
+  document.getElementById('rf-s2').textContent=scores.p2;
+  document.getElementById('rf-s1').className='sf-score'+(scores.p1>=scores.p2?' winner':'');
+  document.getElementById('rf-s2').className='sf-score'+(scores.p2>=scores.p1?' winner':'');
+  sound(win?'w':'n');
 }
 function playAgain(){
-  document.getElementById('result-overlay').style.display='none';
-  scores={p1:0,p2:0}; currentRound=0;
-  skipUsed=false; doubleUsed=false; hintUsed=false;
+  document.getElementById('result-ov').style.display='none';
+  scores={p1:0,p2:0}; curRound=0;
+  skipUsed=false; dblUsed=false; hintUsed=false;
   if(myRole==='host'){
     const room=gLS('room_'+roomCode);
-    questionQueue=getQs(room?.category||'general');
-    bc.postMessage({type:'game_start',names,questions:questionQueue});
-    startGameUI();
+    qQueue=shuffle([...(Q[room?.cat||'general'])]).slice(0,ROUNDS);
+    bc.postMessage({t:'start',names,qs:qQueue});
+    startUI();
   }
 }
 function goHome(){
-  clearInterval(timerInterval);
-  if(lobbyPoll) clearInterval(lobbyPoll);
-  document.getElementById('result-overlay').style.display='none';
+  clearInterval(tInt); clearInterval(poll);
+  document.getElementById('result-ov').style.display='none';
   if(bc){try{bc.close()}catch(e){}} bc=null;
-  rLS('room_'+roomCode);
-  roomCode=''; myRole='';
+  rLS('room_'+roomCode); roomCode=''; myRole='';
   showScreen('home');
 }
 
-// ── الصوت ──────────────────────────────────────────────────
-function playSound(type){
+// ══════════════════════════════════════
+// الصوت
+// ══════════════════════════════════════
+function sound(type){
   try{
     const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    const o=ctx.createOscillator(),g=ctx.createGain();
+    const o=ctx.createOscillator(), g=ctx.createGain();
     o.connect(g); g.connect(ctx.destination);
-    g.gain.setValueAtTime(0.15,ctx.currentTime);
-    if(type==='correct'){
-      o.frequency.setValueAtTime(523,ctx.currentTime);
-      o.frequency.setValueAtTime(659,ctx.currentTime+.15);
-      o.frequency.setValueAtTime(784,ctx.currentTime+.3);
+    g.gain.setValueAtTime(0.13,ctx.currentTime);
+    if(type==='y'){
+      [523,659,784].forEach((f,i)=>o.frequency.setValueAtTime(f,ctx.currentTime+i*.15));
       g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+.6);
       o.start(); o.stop(ctx.currentTime+.6);
-    }else if(type==='wrong'){
-      o.frequency.setValueAtTime(280,ctx.currentTime);
-      o.frequency.setValueAtTime(180,ctx.currentTime+.15);
+    }else if(type==='n'){
+      o.frequency.setValueAtTime(260,ctx.currentTime);
+      o.frequency.setValueAtTime(150,ctx.currentTime+.18);
       g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+.4);
       o.start(); o.stop(ctx.currentTime+.4);
-    }else if(type==='win'){
+    }else if(type==='w'){
       [523,659,784,1047].forEach((f,i)=>{
-        const o2=ctx.createOscillator(),g2=ctx.createGain();
+        const o2=ctx.createOscillator(), g2=ctx.createGain();
         o2.connect(g2); g2.connect(ctx.destination);
         o2.frequency.value=f;
-        g2.gain.setValueAtTime(0.12,ctx.currentTime+i*.12);
+        g2.gain.setValueAtTime(.11,ctx.currentTime+i*.12);
         g2.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*.12+.3);
         o2.start(ctx.currentTime+i*.12); o2.stop(ctx.currentTime+i*.12+.3);
       });
     }
   }catch(e){}
 }
-
-setTimeout(()=>showNotif('💡 افتح تبويبين في المتصفح للعب مع صديقك','info',5000),800);
 </script>
 </body>
 </html>
