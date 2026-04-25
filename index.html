@@ -157,11 +157,6 @@ input:focus, select:focus {
   box-shadow: 0 0 10px rgba(124,111,255,0.2);
 }
 
-.player-card.offline {
-  opacity: 0.5;
-  border-color: #ef4565;
-}
-
 .player-name {
   font-size: 12px;
   color: #9090b0;
@@ -349,14 +344,6 @@ input:focus, select:focus {
   text-align: left;
 }
 
-.chat-message.system {
-  background: none;
-  color: #ffd166;
-  text-align: center;
-  font-style: italic;
-  max-width: 100%;
-}
-
 .reactions {
   display: flex;
   gap: 8px;
@@ -488,11 +475,6 @@ input:focus, select:focus {
   color: #ef4565;
 }
 
-.notif.warning {
-  border-color: #ffd166;
-  color: #ffd166;
-}
-
 .status-dot {
   width: 10px;
   height: 10px;
@@ -507,10 +489,6 @@ input:focus, select:focus {
 
 .dot-ready {
   background: #06d6a0;
-}
-
-.dot-offline {
-  background: #ef4565;
 }
 
 @keyframes pulse {
@@ -531,13 +509,6 @@ input:focus, select:focus {
   text-align: center;
   margin-bottom: 10px;
 }
-
-.question-number {
-  text-align: center;
-  font-size: 12px;
-  color: #7c6fff;
-  margin-top: 5px;
-}
 </style>
 </head>
 <body>
@@ -547,7 +518,7 @@ input:focus, select:focus {
   <div class="card">
     <div class="bible-icon">📖✝️</div>
     <h1>تحدي الكتاب المقدس</h1>
-    <div class="subtitle">العب مع صديقك واختبر معرفتك بالكتاب المقدس</div>
+    <div class="subtitle">العب مع صديقك واختبر معرفتك</div>
     
     <input type="text" id="player-name" placeholder="اسمك" maxlength="15">
     
@@ -568,16 +539,16 @@ input:focus, select:focus {
       <div style="color:#9090b0;font-size:12px">كود الغرفة</div>
       <div class="room-code" id="room-code-display">------</div>
       <button class="btn btn-secondary" onclick="copyCode()" style="margin-top:10px">📋 نسخ الكود</button>
-      <button class="btn btn-danger leave-btn" onclick="leaveRoom()" style="margin-top:5px">❌ مغادرة الغرفة</button>
+      <button class="btn btn-danger" onclick="leaveRoom()" style="margin-top:5px">❌ مغادرة</button>
     </div>
     
     <div class="scoreboard" style="margin-top:20px">
-      <div class="player-card" id="player1-card-lobby">
+      <div class="player-card">
         <div id="p1-dot" class="status-dot dot-waiting"></div>
         <div class="player-name">اللاعب 1</div>
         <div id="p1-name" style="font-weight:700">—</div>
       </div>
-      <div class="player-card" id="player2-card-lobby">
+      <div class="player-card">
         <div id="p2-dot" class="status-dot dot-waiting"></div>
         <div class="player-name">اللاعب 2</div>
         <div id="p2-name" style="font-weight:700">في الانتظار...</div>
@@ -623,8 +594,7 @@ input:focus, select:focus {
     
     <div class="q-card">
       <div class="q-category">📖 الكتاب المقدس</div>
-      <div class="q-text" id="q-text">في انتظار بدء اللعبة...</div>
-      <div class="question-number" id="question-num"></div>
+      <div class="q-text" id="q-text">جاري تحميل السؤال...</div>
       <div id="choices-container"></div>
     </div>
     
@@ -649,7 +619,7 @@ input:focus, select:focus {
       </div>
     </div>
     
-    <button class="btn btn-danger leave-btn" onclick="leaveGame()" style="margin-top:10px">🚪 مغادرة اللعبة</button>
+    <button class="btn btn-danger" onclick="leaveGame()" style="margin-top:10px">🚪 مغادرة</button>
   </div>
 </div>
 
@@ -665,85 +635,42 @@ const firebaseConfig = {
   appId: "1:959500982230:web:0e292eec3297e363e77677"
 };
 
-// ==================== أسئلة الكتاب المقدس (متجددة يومياً) ====================
-// سيتم تحديث الأسئلة بناءً على اليوم الحالي
+// ==================== أسئلة الكتاب المقدس ====================
+const BIBLE_QUESTIONS = [
+  { q: "كم عدد أسفار العهد القديم (البروتستانتي)؟", c: ["36", "39", "42", "45"], a: "39" },
+  { q: "من هو أول إنسان خُلق حسب سفر التكوين؟", c: ["نوح", "إبراهيم", "آدم", "موسى"], a: "آدم" },
+  { q: "في أي نهر تعمّد يسوع المسيح؟", c: ["الفرات", "النيل", "الأردن", "دجلة"], a: "الأردن" },
+  { q: "كم يوماً صام يسوع في البرية؟", c: ["20 يوماً", "30 يوماً", "40 يوماً", "50 يوماً"], a: "40 يوماً" },
+  { q: "من كتب أكثر رسائل العهد الجديد؟", c: ["يوحنا", "بطرس", "بولس الرسول", "لوقا"], a: "بولس الرسول" },
+  { q: "ما اسم المدينة التي وُلد فيها يسوع المسيح؟", c: ["الناصرة", "أورشليم", "بيت لحم", "بيت عنيا"], a: "بيت لحم" },
+  { q: "كم كان عدد تلاميذ يسوع المختارين؟", c: ["10", "11", "12", "13"], a: "12" },
+  { q: "من بنى سفينة النجاة في سفر التكوين؟", c: ["إبراهيم", "موسى", "داود", "نوح"], a: "نوح" },
+  { q: "ما هو أول معجزة ليسوع حسب إنجيل يوحنا؟", c: ["إقامة لعازر", "إطعام الخمسة آلاف", "تحويل الماء إلى خمر", "شفاء الأعمى"], a: "تحويل الماء إلى خمر" },
+  { q: "في أي سفر توجد قصة داود وجليات؟", c: ["التكوين", "المزامير", "صموئيل الأول", "الملوك الأول"], a: "صموئيل الأول" },
+  { q: "من هو الملك الذي بنى الهيكل في أورشليم؟", c: ["داود", "سليمان", "آسا", "يهوشافاط"], a: "سليمان" },
+  { q: "من الذي خان يسوع بثلاثين من الفضة؟", c: ["بطرس", "يوحنا", "يهوذا", "توما"], a: "يهوذا" },
+  { q: "كم عدد وصايا الله العشر؟", c: ["5", "7", "10", "12"], a: "10" },
+  { q: "من هو النبي الذي بلعه الحوت؟", c: ["إشعياء", "إرميا", "يونان", "داود"], a: "يونان" },
+  { q: "ما هو اسم الجبل الذي نزلت فيه الوصايا العشر؟", c: ["جبل الزيتون", "جبل سيناء", "جبل طابور", "جبل الكرمل"], a: "جبل سيناء" },
+  { q: "من هو أول شهيد في المسيحية؟", c: ["بطرس", "بولس", "استفانوس", "يعقوب"], a: "استفانوس" },
+  { q: "ما هو أقصر إصحاح في الكتاب المقدس؟", c: ["مزمور 117", "مزمور 23", "مزمور 1", "مزمور 150"], a: "مزمور 117" },
+  { q: "من هو الشخص الذي عاش أطول عمر في الكتاب المقدس؟", c: ["آدم", "نوح", "متوشالح", "إبراهيم"], a: "متوشالح" }
+];
 
-function getDailyQuestions() {
-  const today = new Date();
-  const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
-  
-  // 10 أسئلة مختلفة كل يوم
-  const allBibleQuestions = [
-    { q: "كم عدد أسفار العهد القديم (البروتستانتي)؟", c: ["36", "39", "42", "45"], a: "39" },
-    { q: "من هو أول إنسان خُلق حسب سفر التكوين؟", c: ["نوح", "إبراهيم", "آدم", "موسى"], a: "آدم" },
-    { q: "في أي نهر تعمّد يسوع المسيح؟", c: ["الفرات", "النيل", "الأردن", "دجلة"], a: "الأردن" },
-    { q: "كم يوماً صام يسوع في البرية؟", c: ["20 يوماً", "30 يوماً", "40 يوماً", "50 يوماً"], a: "40 يوماً" },
-    { q: "من كتب أكثر رسائل العهد الجديد؟", c: ["يوحنا", "بطرس", "بولس الرسول", "لوقا"], a: "بولس الرسول" },
-    { q: "ما اسم المدينة التي وُلد فيها يسوع المسيح؟", c: ["الناصرة", "أورشليم", "بيت لحم", "بيت عنيا"], a: "بيت لحم" },
-    { q: "كم كان عدد تلاميذ يسوع المختارين؟", c: ["10", "11", "12", "13"], a: "12" },
-    { q: "من بنى سفينة النجاة في سفر التكوين؟", c: ["إبراهيم", "موسى", "داود", "نوح"], a: "نوح" },
-    { q: "ما هو أول معجزة ليسوع حسب إنجيل يوحنا؟", c: ["إقامة لعازر", "إطعام الخمسة آلاف", "تحويل الماء إلى خمر", "شفاء الأعمى"], a: "تحويل الماء إلى خمر" },
-    { q: "في أي سفر توجد قصة داود وجليات؟", c: ["التكوين", "المزامير", "صموئيل الأول", "الملوك الأول"], a: "صموئيل الأول" },
-    { q: "من هو الملك الذي بنى الهيكل في أورشليم؟", c: ["داود", "سليمان", "آسا", "يهوشافاط"], a: "سليمان" },
-    { q: "من الذي خان يسوع بثلاثين من الفضة؟", c: ["بطرس", "يوحنا", "يهوذا", "توما"], a: "يهوذا" },
-    { q: "كم عدد وصايا الله العشر؟", c: ["5", "7", "10", "12"], a: "10" },
-    { q: "من هو النبي الذي بلعه الحوت؟", c: ["إشعياء", "إرميا", "يونان", "داود"], a: "يونان" },
-    { q: "ما هو اسم الجبل الذي نزلت فيه الوصايا العشر؟", c: ["جبل الزيتون", "جبل سيناء", "جبل طابور", "جبل الكرمل"], a: "جبل سيناء" },
-    { q: "من هو أول شهيد في المسيحية؟", c: ["بطرس", "بولس", "استفانوس", "يعقوب"], a: "استفانوس" },
-    { q: "ما هو أقصر إصحاح في الكتاب المقدس؟", c: ["مزمور 117", "مزمور 23", "مزمور 1", "مزمور 150"], a: "مزمور 117" },
-    { q: "من هو الشخص الذي عاش أطول عمر في الكتاب المقدس؟", c: ["آدم", "نوح", "متوشالح", "إبراهيم"], a: "متوشالح" },
-    { q: "من هو النبي الذي صعد إلى السماء بمركبة نارية؟", c: ["إشعياء", "إرميا", "إيليا", "أليشع"], a: "إيليا" },
-    { q: "كم عدد أسفار العهد الجديد؟", c: ["24", "25", "26", "27"], a: "27" },
-    { q: "من هو تلميذ يسوع الذي شك في قيامته؟", c: ["بطرس", "أندراوس", "توما", "فيليبس"], a: "توما" },
-    { q: "أين كان بولس الرسول من قبل أن يهتدي؟", c: ["أورشليم", "رومية", "طرسوس", "أنطاكية"], a: "طرسوس" },
-    { q: "من هي أم مريم العذراء؟", c: ["حنة", "إليصابات", "راحيل", "رفقة"], a: "حنة" },
-    { q: "من هو ابن إبراهيم الذي كاد أن يذبحه؟", c: ["اسماعيل", "اسحق", "يعقوب", "عيسو"], a: "اسحق" },
-    { q: "من هو رئيس الكهنة عندما حوكم يسوع؟", c: ["حنان", "قيافا", "زكريا", "أليعازر"], a: "قيافا" },
-    { q: "ما هي اللغة التي كُتب بها العهد الجديد؟", c: ["العبرية", "اليونانية", "الآرامية", "اللاتينية"], a: "اليونانية" },
-    { q: "من هو الكاهن الذي بارك الطفل يسوع في الهيكل؟", c: ["زكريا", "حنان", "سمعان", "قيافا"], a: "سمعان" },
-    { q: "كم كان عمر يسوع عندما صعد إلى الهيكل مع والديه؟", c: ["10 سنوات", "12 سنة", "14 سنة", "16 سنة"], a: "12 سنة" }
-  ];
-  
-  // استخدام رقم اليوم لاختيار 10 أسئلة عشوائية مختلفة كل يوم
-  const shuffled = [...allBibleQuestions];
-  for(let i = shuffled.length - 1; i > 0; i--) {
+function shuffleArray(arr) {
+  for(let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-  
-  // خلط إضافي بناءً على رقم اليوم
-  const seed = dayOfYear;
-  for(let i = 0; i < shuffled.length; i++) {
-    const swapIndex = (i + seed) % shuffled.length;
-    [shuffled[i], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[i]];
-  }
-  
-  return shuffled.slice(0, 10);
+  return arr;
 }
-
-let BIBLE_QUESTIONS = getDailyQuestions();
-
-// تحديث الأسئلة كل يوم جديد
-function updateDailyQuestions() {
-  const today = new Date().toDateString();
-  const lastUpdate = localStorage.getItem('lastQuestionUpdate');
-  
-  if(lastUpdate !== today) {
-    BIBLE_QUESTIONS = getDailyQuestions();
-    localStorage.setItem('lastQuestionUpdate', today);
-    console.log('تم تحديث الأسئلة لهذا اليوم');
-  }
-}
-updateDailyQuestions();
 
 // ==================== متغيرات اللعبة ====================
 let db;
-let firebaseReady = false;
 let myName = '';
 let myRole = '';
 let roomCode = '';
 let roomListener = null;
-let presenceListener = null;
 let currentQuestionListener = null;
 let roundResultListener = null;
 let chatListener = null;
@@ -760,37 +687,20 @@ let answered = false;
 let doubleActive = false;
 let skipUsed = false, doubleUsed = false, hintUsed = false;
 let waitingForNext = false;
-let opponentOnline = true;
 
 // ==================== تهيئة Firebase ====================
 function initFirebase() {
   try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
-    firebaseReady = true;
     console.log('✅ Firebase connected');
-    
-    db.ref('.info/connected').on('value', (snap) => {
-      if(snap.val()) {
-        console.log('✅ Connected to Firebase');
-      } else {
-        showNotification('⚠️ انقطع الاتصال بالإنترنت', 'error');
-      }
-    });
-    
+    showNotification('✅ تم الاتصال', 'success');
   } catch(e) {
     console.error('Firebase error:', e);
-    firebaseReady = false;
     alert('فشل الاتصال بقاعدة البيانات');
   }
 }
 initFirebase();
-
-// ==================== مساعدات ====================
-function showScreen(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(`screen-${screenId}`).classList.add('active');
-}
 
 function showNotification(msg, type = 'info') {
   const existing = document.querySelector('.notif');
@@ -803,6 +713,11 @@ function showNotification(msg, type = 'info') {
   setTimeout(() => div.remove(), 2500);
 }
 
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(`screen-${screenId}`).classList.add('active');
+}
+
 function generateCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
@@ -812,51 +727,6 @@ function generateCode() {
   return code;
 }
 
-function shuffleArray(arr) {
-  for(let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-// ==================== مراقبة وجود اللاعبين ====================
-function setupPresenceTracking() {
-  if(!roomCode) return;
-  
-  const userPresenceRef = db.ref(`presence/${roomCode}/${myRole}`);
-  userPresenceRef.set(true);
-  userPresenceRef.onDisconnect().remove();
-  
-  if(presenceListener) presenceListener.off();
-  const otherRole = myRole === 'host' ? 'guest' : 'host';
-  presenceListener = db.ref(`presence/${roomCode}/${otherRole}`);
-  presenceListener.on('value', (snap) => {
-    const isOnline = snap.val() === true;
-    opponentOnline = isOnline;
-    
-    const playerCard = document.getElementById(myRole === 'host' ? 'player2-card' : 'player1-card');
-    const lobbyCard = document.getElementById(myRole === 'host' ? 'player2-card-lobby' : 'player1-card-lobby');
-    
-    if(playerCard) {
-      if(!isOnline) {
-        playerCard.classList.add('offline');
-        showNotification(`${opponentName} غير متصل!`, 'warning');
-      } else {
-        playerCard.classList.remove('offline');
-      }
-    }
-    
-    if(lobbyCard) {
-      if(!isOnline) {
-        lobbyCard.classList.add('offline');
-      } else {
-        lobbyCard.classList.remove('offline');
-      }
-    }
-  });
-}
-
 // ==================== إنشاء غرفة ====================
 async function createRoom() {
   myName = document.getElementById('player-name').value.trim();
@@ -864,16 +734,11 @@ async function createRoom() {
     showNotification('أدخل اسمك أولاً', 'error');
     return;
   }
-  if(!firebaseReady) {
-    showNotification('قاعدة البيانات غير متصلة', 'error');
-    return;
-  }
   
   roomCode = generateCode();
   myRole = 'host';
   
-  // تحديث الأسئلة قبل بدء اللعبة
-  updateDailyQuestions();
+  // تجهيز الأسئلة
   let qs = shuffleArray([...BIBLE_QUESTIONS]).slice(0, totalRounds);
   questionsList = [...qs];
   
@@ -885,9 +750,7 @@ async function createRoom() {
     currentRound: 0,
     totalRounds: totalRounds,
     questions: qs,
-    createdAt: Date.now(),
-    hostOnline: true,
-    guestOnline: false
+    createdAt: Date.now()
   };
   
   try {
@@ -895,7 +758,7 @@ async function createRoom() {
     playerNames.p1 = myName;
     showLobby();
     listenToRoom();
-    setupPresenceTracking();
+    showNotification(`✅ تم إنشاء الغرفة! الكود: ${roomCode}`, 'success');
   } catch(e) {
     showNotification('خطأ: ' + e.message, 'error');
   }
@@ -915,11 +778,6 @@ async function joinRoom() {
     return;
   }
   
-  if(!firebaseReady) {
-    showNotification('قاعدة البيانات غير متصلة', 'error');
-    return;
-  }
-  
   try {
     const snapshot = await db.ref(`rooms/${code}`).once('value');
     const roomData = snapshot.val();
@@ -932,7 +790,7 @@ async function joinRoom() {
       showNotification('الغرفة ممتلئة', 'error');
       return;
     }
-    if(roomData.status !== 'waiting' && roomData.status !== 'ready') {
+    if(roomData.status !== 'waiting') {
       showNotification('اللعبة بدأت بالفعل', 'error');
       return;
     }
@@ -946,15 +804,12 @@ async function joinRoom() {
     
     await db.ref(`rooms/${roomCode}`).update({
       guest: myName,
-      status: 'ready',
-      guestOnline: true
+      status: 'ready'
     });
     
     showLobby();
     listenToRoom();
-    setupPresenceTracking();
-    
-    showNotification('✅ تم الانضمام إلى الغرفة!', 'success');
+    showNotification('✅ تم الانضمام بنجاح!', 'success');
     
   } catch(e) {
     showNotification('خطأ: ' + e.message, 'error');
@@ -969,12 +824,11 @@ function showLobby() {
   if(myRole === 'host') {
     document.getElementById('p1-name').textContent = myName;
     document.getElementById('p1-dot').className = 'status-dot dot-ready';
-    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#9090b0;padding:20px">⏳ في انتظار المنافس...</div>';
   } else {
     document.getElementById('p1-name').textContent = playerNames.p1;
     document.getElementById('p2-name').textContent = myName;
     document.getElementById('p2-dot').className = 'status-dot dot-ready';
-    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#9090b0;padding:20px">✅ جاهز! في انتظار المضيف لبدء اللعبة...</div>';
+    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#9090b0;padding:20px">✅ جاهز! في انتظار المضيف...</div>';
   }
 }
 
@@ -985,31 +839,22 @@ function listenToRoom() {
   roomListener.on('value', (snapshot) => {
     const room = snapshot.val();
     if(!room) {
-      if(isGameActive) {
-        showNotification('❌ الخصم غادر اللعبة!', 'error');
-        setTimeout(() => goHome(), 2000);
-      } else {
-        showNotification('❌ تم حذف الغرفة', 'error');
-        goHome();
-      }
-      return;
-    }
-    
-    if(room.status === 'abandoned') {
-      showNotification('❌ الخصم غادر الغرفة!', 'error');
+      showNotification('❌ تم حذف الغرفة', 'error');
       goHome();
       return;
     }
     
+    // لاعب ثاني انضم
     if(myRole === 'host' && room.guest && !playerNames.p2) {
       playerNames.p2 = room.guest;
       document.getElementById('p2-name').textContent = room.guest;
       document.getElementById('p2-dot').className = 'status-dot dot-ready';
       document.getElementById('lobby-waiting').classList.add('hidden');
       document.getElementById('lobby-start').classList.remove('hidden');
-      showNotification(`${room.guest} انضم إلى الغرفة!`, 'success');
+      showNotification(`${room.guest} انضم! ابدأ اللعبة`, 'success');
     }
     
+    // بدء اللعبة
     if(room.status === 'playing' && !isGameActive) {
       scores = room.scores || { p1: 0, p2: 0 };
       playerNames.p1 = room.host;
@@ -1017,6 +862,7 @@ function listenToRoom() {
       startGameUI();
     }
     
+    // انتهاء اللعبة
     if(room.status === 'finished' && isGameActive) {
       showResultScreen(room.scores);
     }
@@ -1025,6 +871,10 @@ function listenToRoom() {
 
 // ==================== بدء اللعبة ====================
 async function startGame() {
+  // إعادة تعيين المتغيرات
+  scores = { p1: 0, p2: 0 };
+  currentRound = 0;
+  
   await db.ref(`rooms/${roomCode}`).update({
     status: 'playing',
     currentRound: 0,
@@ -1036,8 +886,8 @@ function startGameUI() {
   isGameActive = true;
   showScreen('game');
   
-  currentRound = 0;
   scores = { p1: 0, p2: 0 };
+  currentRound = 0;
   answered = false;
   doubleActive = false;
   skipUsed = false;
@@ -1045,19 +895,18 @@ function startGameUI() {
   hintUsed = false;
   waitingForNext = false;
   
-  document.getElementById('name-p1').textContent = playerNames.p1 || 'اللاعب 1';
-  document.getElementById('name-p2').textContent = playerNames.p2 || 'اللاعب 2';
+  document.getElementById('name-p1').textContent = playerNames.p1;
+  document.getElementById('name-p2').textContent = playerNames.p2;
   document.getElementById('score-p1').textContent = '0';
   document.getElementById('score-p2').textContent = '0';
   document.getElementById('round-num').textContent = `0/${totalRounds}`;
+  document.getElementById('q-text').textContent = 'جاري تجهيز السؤال الأول...';
   
-  document.getElementById('skip-btn').disabled = false;
-  document.getElementById('double-btn').disabled = false;
-  document.getElementById('hint-btn').disabled = false;
-  
+  // تنظيف المستمعين السابقين
   if(currentQuestionListener) currentQuestionListener.off();
   if(roundResultListener) roundResultListener.off();
   
+  // استماع للسؤال الجديد
   currentQuestionListener = db.ref(`rooms/${roomCode}/currentQuestion`);
   currentQuestionListener.on('value', (snapshot) => {
     const data = snapshot.val();
@@ -1072,6 +921,7 @@ function startGameUI() {
     }
   });
   
+  // استماع للنتائج
   roundResultListener = db.ref(`rooms/${roomCode}/roundResult`);
   roundResultListener.on('value', (snapshot) => {
     const data = snapshot.val();
@@ -1086,47 +936,61 @@ function startGameUI() {
         waitingForNext = true;
         setTimeout(() => {
           waitingForNext = false;
-          if(myRole === 'host') nextQuestion();
-        }, 2000);
+          if(myRole === 'host') {
+            nextQuestion();
+          }
+        }, 2500);
       }
     }
   });
   
   listenToChat();
   
+  // المضيف يبدأ السؤال الأول فوراً
   if(myRole === 'host') {
-    setTimeout(() => nextQuestion(), 1000);
-  } else {
-    document.getElementById('q-text').textContent = '⏳ في انتظار بدء اللعبة...';
-    document.getElementById('choices-container').innerHTML = '';
-    document.getElementById('timer-text').textContent = '— ثانية';
+    setTimeout(() => {
+      console.log('المضيف يبدأ السؤال الأول');
+      nextQuestion();
+    }, 1000);
   }
 }
 
 // ==================== الأسئلة ====================
 async function nextQuestion() {
+  console.log('nextQuestion called, questions left:', questionsList.length);
+  
   if(!questionsList.length) {
+    console.log('لا يوجد أسئلة متبقية، إنهاء اللعبة');
     await db.ref(`rooms/${roomCode}`).update({ status: 'finished', scores: scores });
     return;
   }
   
   currentRound++;
   const question = questionsList.shift();
+  console.log('إرسال السؤال رقم', currentRound, ':', question.q);
   
-  await db.ref(`rooms/${roomCode}/currentQuestion`).set({
-    question: question,
-    round: currentRound,
-    startTime: Date.now()
-  });
+  try {
+    await db.ref(`rooms/${roomCode}/currentQuestion`).set({
+      question: question,
+      round: currentRound,
+      startTime: Date.now()
+    });
+    console.log('تم إرسال السؤال بنجاح');
+  } catch(e) {
+    console.error('خطأ في إرسال السؤال:', e);
+  }
 }
 
 function displayQuestion() {
-  if(!currentQuestion) return;
+  if(!currentQuestion) {
+    console.log('لا يوجد سؤال حالي');
+    return;
+  }
   
-  document.getElementById('q-cat').innerHTML = '📖 الكتاب المقدس';
+  console.log('عرض السؤال:', currentQuestion.q);
   document.getElementById('q-text').innerHTML = currentQuestion.q;
-  document.getElementById('question-num').innerHTML = `السؤال ${currentRound} من ${totalRounds}`;
   
+  // تحديد من دوره (السؤال الأول للمضيف، الثاني للضيف، وهكذا)
   const isHostTurn = (currentRound % 2 === 1);
   const isMyTurn = (myRole === 'host' && isHostTurn) || (myRole === 'guest' && !isHostTurn);
   
@@ -1141,6 +1005,7 @@ function displayQuestion() {
     return;
   }
   
+  // عرض الأزرار للمستخدم الحالي
   currentQuestion.c.forEach(choice => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
@@ -1166,7 +1031,7 @@ function submitAnswer(answer) {
   }
   
   document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
-  showNotification(isCorrect ? `✅ صحيح! +${points} نقطة` : '❌ خطأ', isCorrect ? 'success' : 'error');
+  showNotification(isCorrect ? `✅ صحيح! +${points}` : `❌ خطأ! الإجابة الصحيحة: ${currentQuestion.a}`, isCorrect ? 'success' : 'error');
   
   const gameOver = (currentRound >= totalRounds || questionsList.length === 0);
   
@@ -1191,7 +1056,6 @@ function highlightAnswer(correctAnswer) {
     } else if(btn.textContent !== correctAnswer && btn.textContent !== '⏳ دور الخصم...') {
       btn.classList.add('wrong');
     }
-    btn.disabled = true;
   });
 }
 
@@ -1218,22 +1082,20 @@ function startTimer(seconds) {
       fill.classList.add('warning');
     }
     
-    if(timeLeft <= 0) {
+    if(timeLeft <= 0 && !answered) {
       clearInterval(timerInterval);
-      if(!answered) {
-        answered = true;
-        showNotification('⏰ انتهى الوقت!', 'error');
-        document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
-        
-        const gameOver = (currentRound >= totalRounds || questionsList.length === 0);
-        db.ref(`rooms/${roomCode}/roundResult`).set({
-          scores: scores,
-          correctAnswer: currentQuestion?.a || '',
-          pointsEarned: 0,
-          gameOver: gameOver,
-          timestamp: Date.now()
-        });
-      }
+      answered = true;
+      showNotification('⏰ انتهى الوقت!', 'error');
+      document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
+      
+      const gameOver = (currentRound >= totalRounds || questionsList.length === 0);
+      db.ref(`rooms/${roomCode}/roundResult`).set({
+        scores: scores,
+        correctAnswer: currentQuestion?.a || '',
+        pointsEarned: 0,
+        gameOver: gameOver,
+        timestamp: Date.now()
+      });
     }
   }, 1000);
 }
@@ -1241,11 +1103,6 @@ function startTimer(seconds) {
 function updateScoresUI() {
   document.getElementById('score-p1').textContent = scores.p1;
   document.getElementById('score-p2').textContent = scores.p2;
-  
-  const s1 = document.getElementById('score-p1');
-  const s2 = document.getElementById('score-p2');
-  s1.className = `player-score ${scores.p1 >= scores.p2 ? 'green' : 'red'}`;
-  s2.className = `player-score ${scores.p2 >= scores.p1 ? 'green' : 'red'}`;
 }
 
 // ==================== القدرات ====================
@@ -1263,7 +1120,7 @@ async function useDouble() {
   doubleUsed = true;
   doubleActive = true;
   document.getElementById('double-btn').disabled = true;
-  showNotification('⚡ النقاط مضاعفة لهذه الجولة!', 'info');
+  showNotification('⚡ النقاط مضاعفة!', 'info');
 }
 
 async function useHint() {
@@ -1272,13 +1129,13 @@ async function useHint() {
   document.getElementById('hint-btn').disabled = true;
   
   const buttons = document.querySelectorAll('.choice-btn');
-  const wrongButtons = Array.from(buttons).filter(btn => btn.textContent !== currentQuestion?.a && btn.textContent !== '⏳ دور الخصم...');
+  const wrongButtons = Array.from(buttons).filter(btn => btn.textContent !== currentQuestion?.a);
   const toRemove = wrongButtons.slice(0, Math.floor(wrongButtons.length / 2));
   toRemove.forEach(btn => {
     btn.style.opacity = '0.3';
     btn.disabled = true;
   });
-  showNotification('💡 تم حذف إجابتين خاطئتين', 'info');
+  showNotification('💡 تم حذف إجابتين', 'info');
 }
 
 // ==================== الشات ====================
@@ -1311,8 +1168,7 @@ async function sendReaction(emoji) {
   await db.ref(`rooms/${roomCode}/chat`).push({
     sender: myName,
     text: emoji,
-    timestamp: Date.now(),
-    isReaction: true
+    timestamp: Date.now()
   });
 }
 
@@ -1340,8 +1196,8 @@ function showResultScreen(finalScores) {
   resultDiv.innerHTML = `
     <div class="result-card">
       <div class="result-emoji">${isTie ? '🤝' : (isWin ? '🏆' : '😢')}</div>
-      <div class="result-title">${isTie ? 'تعادل!' : (isWin ? 'أنت الفائز!' : 'لقد خسرت')}</div>
-      <div class="result-sub">${isTie ? 'لعبة رائعة!' : (isWin ? `سجلت ${myScore} نقطة` : `${playerNames[myRole === 'host' ? 'p2' : 'p1']} سجل ${theirScore} نقطة`)}</div>
+      <div class="result-title">${isTie ? 'تعادل!' : (isWin ? 'أنت الفائز!' : 'خسرت')}</div>
+      <div class="result-sub">${isTie ? 'لعبة رائعة!' : (isWin ? `${myScore} نقطة` : `${theirScore} نقطة`)}</div>
       <div class="final-scores">
         <div class="final-score-item">
           <div class="final-score-name">${playerNames.p1}</div>
@@ -1356,7 +1212,6 @@ function showResultScreen(finalScores) {
       <button class="btn btn-secondary" onclick="goHome()">🏠 الرئيسية</button>
     </div>
   `;
-  
   document.body.appendChild(resultDiv);
 }
 
@@ -1371,18 +1226,15 @@ function goHome() {
   if(currentQuestionListener) currentQuestionListener.off();
   if(roundResultListener) roundResultListener.off();
   if(chatListener) chatListener.off();
-  if(presenceListener) presenceListener.off();
   if(timerInterval) clearInterval(timerInterval);
   
   if(roomCode && db) {
-    db.ref(`presence/${roomCode}/${myRole}`).remove();
-    db.ref(`rooms/${roomCode}`).update({ status: 'abandoned' }).catch(e => console.log(e));
+    db.ref(`rooms/${roomCode}`).remove().catch(e => console.log(e));
   }
   
   document.querySelector('.result-overlay')?.remove();
   isGameActive = false;
   roomCode = '';
-  myRole = '';
   showScreen('home');
   document.getElementById('join-code').value = '';
   document.getElementById('player-name').value = '';
@@ -1401,11 +1253,6 @@ function copyCode() {
   navigator.clipboard.writeText(roomCode);
   showNotification('✅ تم نسخ الكود', 'success');
 }
-
-// تحديث الأسئلة عند فتح الصفحة
-window.addEventListener('load', () => {
-  updateDailyQuestions();
-});
 </script>
 </body>
 </html>
