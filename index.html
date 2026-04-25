@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>تحدي المعلومات - نسخة موبايل</title>
+<title>تحدي المعلومات</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -97,15 +97,6 @@ input:focus, select:focus {
   background: #1c1c27;
   color: white;
   border: 1px solid #2a2a35;
-}
-
-.btn-danger {
-  background: #ef4565;
-  color: white;
-}
-
-.btn:active {
-  opacity: 0.8;
 }
 
 .room-code {
@@ -265,7 +256,6 @@ input:focus, select:focus {
   margin: 6px 0;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
 }
 
 .choice-btn:active {
@@ -305,10 +295,6 @@ input:focus, select:focus {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-}
-
-.powerup-btn:active {
-  transform: scale(0.97);
 }
 
 .powerup-btn:disabled {
@@ -509,10 +495,6 @@ input:focus, select:focus {
 .text-center {
   text-align: center;
 }
-
-.mt-10 {
-  margin-top: 10px;
-}
 </style>
 </head>
 <body>
@@ -588,7 +570,7 @@ input:focus, select:focus {
       </div>
       <div class="round-info">
         <div class="round-label">الجولة</div>
-        <div class="round-number" id="round-num">1/10</div>
+        <div class="round-number" id="round-num">0/10</div>
       </div>
       <div class="player-card" id="player2-card">
         <div class="player-name" id="name-p2">اللاعب 2</div>
@@ -598,14 +580,14 @@ input:focus, select:focus {
     
     <div class="timer-container">
       <div class="timer-bar">
-        <div class="timer-fill" id="timer-fill"></div>
+        <div class="timer-fill" id="timer-fill" style="width:100%"></div>
       </div>
-      <div class="timer-text" id="timer-text">25 ثانية</div>
+      <div class="timer-text" id="timer-text">— ثانية</div>
     </div>
     
     <div class="q-card">
       <div class="q-category" id="q-cat">معلومات عامة</div>
-      <div class="q-text" id="q-text">جاري تحميل السؤال...</div>
+      <div class="q-text" id="q-text">في انتظار بدء اللعبة...</div>
       <div id="choices-container"></div>
     </div>
     
@@ -644,26 +626,6 @@ const firebaseConfig = {
   appId: "1:959500982230:web:0e292eec3297e363e77677"
 };
 
-// ==================== المتغيرات ====================
-let db;
-let firebaseReady = false;
-let myName = '';
-let myRole = ''; // 'host' or 'guest'
-let roomCode = '';
-let currentRoomRef = null;
-let currentQRef = null;
-let resultRef = null;
-let chatRef = null;
-let timerInterval = null;
-let currentQuestion = null;
-let currentRound = 0;
-let scores = { p1: 0, p2: 0 };
-let playerNames = { p1: '', p2: '' };
-let answered = false;
-let doubleActive = false;
-let skipUsed = false, doubleUsed = false, hintUsed = false;
-let questionsList = [];
-
 // ==================== الأسئلة ====================
 const QUESTIONS = {
   general: [
@@ -672,11 +634,7 @@ const QUESTIONS = {
     { q: "ما هو أكبر محيط في العالم؟", c: ["الأطلسي", "الهندي", "الهادئ", "المتجمد"], a: "الهادئ" },
     { q: "الذهب رمزه الكيميائي Au", c: ["صح", "خطأ"], a: "صح" },
     { q: "ما هي أصغر دولة في العالم؟", c: ["موناكو", "الفاتيكان", "سان مارينو", "مالطا"], a: "الفاتيكان" },
-    { q: "كم عدد قارات العالم؟", c: ["5", "6", "7", "8"], a: "7" },
-    { q: "من هو مؤسس شركة مايكروسوفت؟", c: ["ستيف جوبز", "بيل غيتس", "مارك زوكربيرغ", "جيف بيزوس"], a: "بيل غيتس" },
-    { q: "ما هي عملة المملكة المتحدة؟", c: ["الدولار", "اليورو", "الجنيه", "الين"], a: "الجنيه" },
-    { q: "من فاز بكأس العالم 2022؟", c: ["فرنسا", "الأرجنتين", "البرازيل", "ألمانيا"], a: "الأرجنتين" },
-    { q: "ما هو أطول نهر في العالم؟", c: ["الأمازون", "النيل", "اليانغتسي", "المسيسيبي"], a: "النيل" }
+    { q: "كم عدد قارات العالم؟", c: ["5", "6", "7", "8"], a: "7" }
   ],
   sports: [
     { q: "كم عدد لاعبي كرة القدم داخل الملعب؟", c: ["20", "22", "24", "26"], a: "22" },
@@ -709,23 +667,46 @@ const CAT_NAMES = {
   arab: '🗺️ الوطن العربي'
 };
 
-// ==================== Firebase Init ====================
+// ==================== متغيرات اللعبة ====================
+let db;
+let firebaseReady = false;
+let myName = '';
+let myRole = ''; // 'host' or 'guest'
+let roomCode = '';
+let roomListener = null;
+let currentQuestionListener = null;
+let roundResultListener = null;
+let chatListener = null;
+let timerInterval = null;
+let isGameActive = false;
+
+let currentQuestion = null;
+let currentRound = 0;
+let totalRounds = 6; // عدد الجولات
+let scores = { p1: 0, p2: 0 };
+let playerNames = { p1: '', p2: '' };
+let questionsList = [];
+let answered = false;
+let doubleActive = false;
+let skipUsed = false, doubleUsed = false, hintUsed = false;
+let waitingForNext = false;
+
+// ==================== تهيئة Firebase ====================
 function initFirebase() {
   try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
     firebaseReady = true;
     console.log('✅ Firebase connected');
-    showNotification('✅ تم الاتصال بقاعدة البيانات', 'success');
   } catch(e) {
     console.error('Firebase error:', e);
     firebaseReady = false;
-    showNotification('❌ فشل الاتصال بقاعدة البيانات', 'error');
+    alert('فشل الاتصال بقاعدة البيانات');
   }
 }
 initFirebase();
 
-// ==================== المساعدات ====================
+// ==================== مساعدات ====================
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(`screen-${screenId}`).classList.add('active');
@@ -739,7 +720,7 @@ function showNotification(msg, type = 'info') {
   div.className = `notif ${type}`;
   div.textContent = msg;
   document.body.appendChild(div);
-  setTimeout(() => div.remove(), 2500);
+  setTimeout(() => div.remove(), 2000);
 }
 
 function generateCode() {
@@ -777,7 +758,7 @@ async function createRoom() {
   
   // تجهيز الأسئلة
   let qs = [...(QUESTIONS[category] || QUESTIONS.general)];
-  qs = shuffleArray(qs).slice(0, 8); // 8 أسئلة فقط عشان اللعبة أسرع
+  qs = shuffleArray(qs).slice(0, totalRounds);
   questionsList = [...qs];
   
   const roomData = {
@@ -787,6 +768,7 @@ async function createRoom() {
     status: 'waiting',
     scores: { p1: 0, p2: 0 },
     currentRound: 0,
+    totalRounds: totalRounds,
     questions: qs,
     createdAt: Date.now()
   };
@@ -797,7 +779,7 @@ async function createRoom() {
     showLobby();
     listenToRoom();
   } catch(e) {
-    showNotification('خطأ في إنشاء الغرفة: ' + e.message, 'error');
+    showNotification('خطأ: ' + e.message, 'error');
   }
 }
 
@@ -821,8 +803,8 @@ async function joinRoom() {
   }
   
   try {
-    const room = await db.ref(`rooms/${code}`).once('value');
-    const roomData = room.val();
+    const snapshot = await db.ref(`rooms/${code}`).once('value');
+    const roomData = snapshot.val();
     
     if(!roomData) {
       showNotification('الغرفة غير موجودة', 'error');
@@ -841,6 +823,7 @@ async function joinRoom() {
     myRole = 'guest';
     playerNames.p1 = roomData.host;
     playerNames.p2 = myName;
+    totalRounds = roomData.totalRounds || 6;
     questionsList = [...(roomData.questions || [])];
     
     await db.ref(`rooms/${roomCode}`).update({
@@ -851,11 +834,11 @@ async function joinRoom() {
     showLobby();
     listenToRoom();
   } catch(e) {
-    showNotification('خطأ في الانضمام: ' + e.message, 'error');
+    showNotification('خطأ: ' + e.message, 'error');
   }
 }
 
-// ======================= شاشة الانتظار =======================
+// ==================== شاشة الانتظار ====================
 function showLobby() {
   showScreen('lobby');
   document.getElementById('room-code-display').textContent = roomCode;
@@ -867,15 +850,15 @@ function showLobby() {
     document.getElementById('p1-name').textContent = playerNames.p1;
     document.getElementById('p2-name').textContent = myName;
     document.getElementById('p2-dot').className = 'status-dot dot-ready';
-    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#9090b0;padding:20px">✅ تم الاتصال! في انتظار بدء اللعبة...</div>';
+    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#9090b0;padding:20px">✅ جاهز! في انتظار المضيف...</div>';
   }
 }
 
 function listenToRoom() {
-  if(currentRoomRef) currentRoomRef.off();
+  if(roomListener) roomListener.off();
   
-  currentRoomRef = db.ref(`rooms/${roomCode}`);
-  currentRoomRef.on('value', (snapshot) => {
+  roomListener = db.ref(`rooms/${roomCode}`);
+  roomListener.on('value', (snapshot) => {
     const room = snapshot.val();
     if(!room) return;
     
@@ -886,11 +869,11 @@ function listenToRoom() {
       document.getElementById('p2-dot').className = 'status-dot dot-ready';
       document.getElementById('lobby-waiting').classList.add('hidden');
       document.getElementById('lobby-start').classList.remove('hidden');
-      showNotification(`${room.guest} انضم إلى الغرفة!`, 'success');
+      showNotification(`${room.guest} انضم!`, 'success');
     }
     
     // بدء اللعبة
-    if(room.status === 'playing') {
+    if(room.status === 'playing' && !isGameActive) {
       scores = room.scores || { p1: 0, p2: 0 };
       playerNames.p1 = room.host;
       playerNames.p2 = room.guest;
@@ -899,12 +882,12 @@ function listenToRoom() {
     
     // انتهاء اللعبة
     if(room.status === 'finished') {
-      showResult(room.scores);
+      if(isGameActive) showResultScreen(room.scores);
     }
   });
 }
 
-// ======================= بدء اللعبة =======================
+// ==================== بدء اللعبة ====================
 async function startGame() {
   await db.ref(`rooms/${roomCode}`).update({
     status: 'playing',
@@ -914,7 +897,9 @@ async function startGame() {
 }
 
 function startGameUI() {
+  isGameActive = true;
   showScreen('game');
+  
   currentRound = 0;
   scores = { p1: 0, p2: 0 };
   answered = false;
@@ -922,64 +907,69 @@ function startGameUI() {
   skipUsed = false;
   doubleUsed = false;
   hintUsed = false;
+  waitingForNext = false;
   
   document.getElementById('name-p1').textContent = playerNames.p1 || 'اللاعب 1';
   document.getElementById('name-p2').textContent = playerNames.p2 || 'اللاعب 2';
-  updateScoresUI();
+  document.getElementById('score-p1').textContent = '0';
+  document.getElementById('score-p2').textContent = '0';
+  document.getElementById('round-num').textContent = `0/${totalRounds}`;
   
-  // تفعيل الأزرار
   document.getElementById('skip-btn').disabled = false;
   document.getElementById('double-btn').disabled = false;
   document.getElementById('hint-btn').disabled = false;
   
-  if(myRole === 'host') {
-    nextQuestion();
-  }
+  // تنظيف المستمعين السابقين
+  if(currentQuestionListener) currentQuestionListener.off();
+  if(roundResultListener) roundResultListener.off();
   
-  listenToGame();
-}
-
-function listenToGame() {
-  // استماع للسؤال الحالي
-  if(currentQRef) currentQRef.off();
-  currentQRef = db.ref(`rooms/${roomCode}/currentQuestion`);
-  currentQRef.on('value', (snapshot) => {
+  // استماع للسؤال الجديد
+  currentQuestionListener = db.ref(`rooms/${roomCode}/currentQuestion`);
+  currentQuestionListener.on('value', (snapshot) => {
     const data = snapshot.val();
-    if(data && data.round !== currentRound) {
+    if(data && data.round !== currentRound && !waitingForNext) {
       currentQuestion = data.question;
       currentRound = data.round;
       answered = false;
       doubleActive = false;
+      document.getElementById('round-num').textContent = `${currentRound}/${totalRounds}`;
       displayQuestion();
-      startTimer(data.timeLeft || 25);
+      startTimer(25);
     }
   });
   
   // استماع للنتائج
-  if(resultRef) resultRef.off();
-  resultRef = db.ref(`rooms/${roomCode}/roundResult`);
-  resultRef.on('value', (snapshot) => {
+  roundResultListener = db.ref(`rooms/${roomCode}/roundResult`);
+  roundResultListener.on('value', (snapshot) => {
     const data = snapshot.val();
     if(data) {
       scores = data.scores;
       updateScoresUI();
-      showAnswerResult(data.correctAnswer, data.pointsEarned);
+      highlightAnswer(data.correctAnswer);
       
       if(data.gameOver) {
-        setTimeout(() => showResult(data.scores), 2000);
-      } else if(myRole === 'host') {
-        setTimeout(() => nextQuestion(), 2500);
+        setTimeout(() => showResultScreen(data.scores), 2000);
+      } else {
+        waitingForNext = true;
+        setTimeout(() => {
+          waitingForNext = false;
+          if(myRole === 'host') nextQuestion();
+        }, 2000);
       }
     }
   });
   
   listenToChat();
+  
+  // المضيف يبدأ السؤال الأول
+  if(myRole === 'host') {
+    setTimeout(() => nextQuestion(), 500);
+  }
 }
 
-// ======================= الأسئلة =======================
+// ==================== الأسئلة ====================
 async function nextQuestion() {
   if(!questionsList.length) {
-    // انتهت الأسئلة
     await db.ref(`rooms/${roomCode}`).update({ status: 'finished', scores: scores });
     return;
   }
@@ -990,7 +980,6 @@ async function nextQuestion() {
   await db.ref(`rooms/${roomCode}/currentQuestion`).set({
     question: question,
     round: currentRound,
-    timeLeft: 25,
     startTime: Date.now()
   });
 }
@@ -998,18 +987,19 @@ async function nextQuestion() {
 function displayQuestion() {
   if(!currentQuestion) return;
   
-  const category = document.getElementById('category').value;
+  const category = document.getElementById('category')?.value || 'general';
   document.getElementById('q-cat').textContent = CAT_NAMES[category] || 'معلومات عامة';
   document.getElementById('q-text').textContent = currentQuestion.q;
-  document.getElementById('round-num').textContent = `${currentRound}/8`;
+  
+  // تحديد دور من يجيب
+  const isHostTurn = (currentRound % 2 === 1);
+  const isMyTurn = (myRole === 'host' && isHostTurn) || (myRole === 'guest' && !isHostTurn);
+  
+  document.getElementById('player1-card').classList.toggle('active', myRole === 'host' && isMyTurn);
+  document.getElementById('player2-card').classList.toggle('active', myRole === 'guest' && isMyTurn);
   
   const container = document.getElementById('choices-container');
   container.innerHTML = '';
-  
-  // تحديد أي لاعب دوره
-  const isMyTurn = (myRole === 'host' && currentRound % 2 === 1) || (myRole === 'guest' && currentRound % 2 === 0);
-  document.getElementById('player1-card').classList.toggle('active', myRole === 'host' && isMyTurn);
-  document.getElementById('player2-card').classList.toggle('active', myRole === 'guest' && isMyTurn);
   
   currentQuestion.c.forEach(choice => {
     const btn = document.createElement('button');
@@ -1024,7 +1014,7 @@ function displayQuestion() {
 function submitAnswer(answer) {
   if(answered) return;
   answered = true;
-  clearInterval(timerInterval);
+  if(timerInterval) clearInterval(timerInterval);
   
   const isCorrect = (answer === currentQuestion.a);
   const points = isCorrect ? (doubleActive ? 20 : 10) : 0;
@@ -1038,10 +1028,9 @@ function submitAnswer(answer) {
   // تعطيل الأزرار
   document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
   
-  // إظهار النتيجة
-  showNotification(isCorrect ? `✅ صحيح! +${points} نقطة` : '❌ خطأ', isCorrect ? 'success' : 'error');
+  showNotification(isCorrect ? `✅ صحيح! +${points}` : '❌ خطأ', isCorrect ? 'success' : 'error');
   
-  const gameOver = (currentRound >= 8 || questionsList.length === 0);
+  const gameOver = (currentRound >= totalRounds || questionsList.length === 0);
   
   db.ref(`rooms/${roomCode}/roundResult`).set({
     scores: scores,
@@ -1056,12 +1045,12 @@ function submitAnswer(answer) {
   }
 }
 
-function showAnswerResult(correctAnswer, points) {
+function highlightAnswer(correctAnswer) {
   const buttons = document.querySelectorAll('.choice-btn');
   buttons.forEach(btn => {
     if(btn.textContent === correctAnswer) {
       btn.classList.add('correct');
-    } else if(btn.textContent !== correctAnswer && btn.classList.contains('correct') === false) {
+    } else if(btn.textContent !== correctAnswer) {
       btn.classList.add('wrong');
     }
     btn.disabled = true;
@@ -1069,16 +1058,20 @@ function showAnswerResult(correctAnswer, points) {
 }
 
 function startTimer(seconds) {
+  if(timerInterval) clearInterval(timerInterval);
+  
   let timeLeft = seconds;
   const fill = document.getElementById('timer-fill');
   const text = document.getElementById('timer-text');
   
-  if(timerInterval) clearInterval(timerInterval);
+  fill.style.width = '100%';
+  fill.classList.remove('warning', 'danger');
+  text.textContent = `${seconds} ثانية`;
   
   timerInterval = setInterval(() => {
     timeLeft--;
-    const percent = (timeLeft / 25) * 100;
-    fill.style.width = `${percent}%`;
+    const percent = (timeLeft / seconds) * 100;
+    fill.style.width = `${Math.max(0, percent)}%`;
     text.textContent = `${timeLeft} ثانية`;
     
     if(timeLeft <= 8) {
@@ -1094,7 +1087,7 @@ function startTimer(seconds) {
         showNotification('⏰ انتهى الوقت!', 'error');
         document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
         
-        const gameOver = (currentRound >= 8 || questionsList.length === 0);
+        const gameOver = (currentRound >= totalRounds || questionsList.length === 0);
         db.ref(`rooms/${roomCode}/roundResult`).set({
           scores: scores,
           correctAnswer: currentQuestion?.a || '',
@@ -1111,18 +1104,18 @@ function updateScoresUI() {
   document.getElementById('score-p1').textContent = scores.p1;
   document.getElementById('score-p2').textContent = scores.p2;
   
-  const score1El = document.getElementById('score-p1');
-  const score2El = document.getElementById('score-p2');
-  score1El.className = `player-score ${scores.p1 >= scores.p2 ? 'green' : 'red'}`;
-  score2El.className = `player-score ${scores.p2 >= scores.p1 ? 'green' : 'red'}`;
+  const s1 = document.getElementById('score-p1');
+  const s2 = document.getElementById('score-p2');
+  s1.className = `player-score ${scores.p1 >= scores.p2 ? 'green' : 'red'}`;
+  s2.className = `player-score ${scores.p2 >= scores.p1 ? 'green' : 'red'}`;
 }
 
-// ======================= القدرات =======================
+// ==================== القدرات ====================
 async function useSkip() {
   if(skipUsed || answered || myRole !== 'host') return;
   skipUsed = true;
   document.getElementById('skip-btn').disabled = true;
-  clearInterval(timerInterval);
+  if(timerInterval) clearInterval(timerInterval);
   showNotification('⏭ تم تخطي السؤال', 'info');
   await nextQuestion();
 }
@@ -1132,7 +1125,7 @@ async function useDouble() {
   doubleUsed = true;
   doubleActive = true;
   document.getElementById('double-btn').disabled = true;
-  showNotification('⚡ النقاط مضاعفة للجولة الحالية!', 'info');
+  showNotification('⚡ النقاط مضاعفة!', 'info');
 }
 
 async function useHint() {
@@ -1147,18 +1140,20 @@ async function useHint() {
     btn.style.opacity = '0.3';
     btn.disabled = true;
   });
-  showNotification('💡 تم حذف إجابتين خاطئتين', 'info');
+  showNotification('💡 تم حذف إجابتين', 'info');
 }
 
-// ======================= الشات =======================
+// ==================== الشات ====================
 function listenToChat() {
-  if(chatRef) chatRef.off();
-  chatRef = db.ref(`rooms/${roomCode}/chat`);
+  if(chatListener) chatListener.off();
+  chatListener = db.ref(`rooms/${roomCode}/chat`);
   
-  chatRef.on('child_added', (snapshot) => {
+  chatListener.on('child_added', (snapshot) => {
     const msg = snapshot.val();
-    if(msg) {
-      addChatMessage(msg.text, msg.sender === myName ? 'me' : 'them', msg.sender);
+    if(msg && msg.sender !== myName) {
+      addChatMessage(msg.text, 'them', msg.sender);
+    } else if(msg && msg.sender === myName) {
+      addChatMessage(msg.text, 'me', msg.sender);
     }
   });
 }
@@ -1169,7 +1164,7 @@ async function sendChat() {
   if(!text) return;
   
   input.value = '';
-  await chatRef.push({
+  await db.ref(`rooms/${roomCode}/chat`).push({
     sender: myName,
     text: text,
     timestamp: Date.now()
@@ -1177,7 +1172,7 @@ async function sendChat() {
 }
 
 async function sendReaction(emoji) {
-  await chatRef.push({
+  await db.ref(`rooms/${roomCode}/chat`).push({
     sender: myName,
     text: emoji,
     timestamp: Date.now(),
@@ -1194,9 +1189,10 @@ function addChatMessage(text, type, sender) {
   container.scrollTop = container.scrollHeight;
 }
 
-// ======================= النتيجة =======================
-function showResult(finalScores) {
-  clearInterval(timerInterval);
+// ==================== النتيجة ====================
+function showResultScreen(finalScores) {
+  isGameActive = false;
+  if(timerInterval) clearInterval(timerInterval);
   
   const myScore = myRole === 'host' ? finalScores.p1 : finalScores.p2;
   const theirScore = myRole === 'host' ? finalScores.p2 : finalScores.p1;
@@ -1208,15 +1204,15 @@ function showResult(finalScores) {
   resultDiv.innerHTML = `
     <div class="result-card">
       <div class="result-emoji">${isTie ? '🤝' : (isWin ? '🏆' : '😢')}</div>
-      <div class="result-title">${isTie ? 'تعادل!' : (isWin ? 'أنت الفائز!' : 'خسرت هذه المرة')}</div>
-      <div class="result-sub">${isTie ? 'لعبة رائعة!' : (isWin ? `تهانينا! ${myScore} نقطة` : `المنافس فاز بـ ${theirScore} نقطة`)}</div>
+      <div class="result-title">${isTie ? 'تعادل!' : (isWin ? 'أنت الفائز!' : 'خسرت')}</div>
+      <div class="result-sub">${isTie ? 'لعبة رائعة!' : (isWin ? `${myScore} نقطة` : `${theirScore} نقطة`)}</div>
       <div class="final-scores">
         <div class="final-score-item">
-          <div class="final-score-name">${playerNames.p1 || 'اللاعب 1'}</div>
+          <div class="final-score-name">${playerNames.p1}</div>
           <div class="final-score-value ${finalScores.p1 >= finalScores.p2 ? 'winner' : ''}">${finalScores.p1}</div>
         </div>
         <div class="final-score-item">
-          <div class="final-score-name">${playerNames.p2 || 'اللاعب 2'}</div>
+          <div class="final-score-name">${playerNames.p2}</div>
           <div class="final-score-value ${finalScores.p2 >= finalScores.p1 ? 'winner' : ''}">${finalScores.p2}</div>
         </div>
       </div>
@@ -1229,22 +1225,28 @@ function showResult(finalScores) {
 }
 
 function goHome() {
-  if(currentRoomRef) currentRoomRef.off();
-  if(currentQRef) currentQRef.off();
-  if(resultRef) resultRef.off();
-  if(chatRef) chatRef.off();
+  // تنظيف المستمعين
+  if(roomListener) roomListener.off();
+  if(currentQuestionListener) currentQuestionListener.off();
+  if(roundResultListener) roundResultListener.off();
+  if(chatListener) chatListener.off();
   if(timerInterval) clearInterval(timerInterval);
   
+  // حذف الغرفة
+  if(roomCode && db) {
+    db.ref(`rooms/${roomCode}`).remove().catch(e => console.log(e));
+  }
+  
   document.querySelector('.result-overlay')?.remove();
+  isGameActive = false;
+  roomCode = '';
   showScreen('home');
   document.getElementById('join-code').value = '';
 }
 
 async function leaveRoom() {
   if(roomCode && db) {
-    try {
-      await db.ref(`rooms/${roomCode}`).remove();
-    } catch(e) {}
+    await db.ref(`rooms/${roomCode}`).remove().catch(e => console.log(e));
   }
   goHome();
 }
