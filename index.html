@@ -57,7 +57,7 @@ h1 {
   margin-bottom: 20px;
 }
 
-input, select {
+input {
   width: 100%;
   padding: 14px;
   background: #1c1c27;
@@ -70,7 +70,7 @@ input, select {
   text-align: right;
 }
 
-input:focus, select:focus {
+input:focus {
   outline: none;
   border-color: #7c6fff;
 }
@@ -149,12 +149,13 @@ input:focus, select:focus {
   text-align: center;
   flex: 1;
   border: 1.5px solid #2a2a35;
-  position: relative;
+  transition: all 0.3s;
 }
 
 .player-card.active {
   border-color: #7c6fff;
-  box-shadow: 0 0 10px rgba(124,111,255,0.2);
+  box-shadow: 0 0 10px rgba(124,111,255,0.3);
+  background: rgba(124,111,255,0.1);
 }
 
 .player-name {
@@ -233,6 +234,7 @@ input:focus, select:focus {
   border-radius: 16px;
   padding: 20px;
   margin: 15px 0;
+  min-height: 200px;
 }
 
 .q-category {
@@ -264,6 +266,7 @@ input:focus, select:focus {
   margin: 6px 0;
   text-align: center;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .choice-btn:active {
@@ -509,6 +512,14 @@ input:focus, select:focus {
   text-align: center;
   margin-bottom: 10px;
 }
+
+.waiting-turn {
+  text-align: center;
+  padding: 30px;
+  color: #ffd166;
+  font-size: 16px;
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
@@ -594,7 +605,7 @@ input:focus, select:focus {
     
     <div class="q-card">
       <div class="q-category">📖 الكتاب المقدس</div>
-      <div class="q-text" id="q-text">جاري تحميل السؤال...</div>
+      <div class="q-text" id="q-text">...</div>
       <div id="choices-container"></div>
     </div>
     
@@ -694,7 +705,6 @@ function initFirebase() {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
     console.log('✅ Firebase connected');
-    showNotification('✅ تم الاتصال', 'success');
   } catch(e) {
     console.error('Firebase error:', e);
     alert('فشل الاتصال بقاعدة البيانات');
@@ -738,7 +748,6 @@ async function createRoom() {
   roomCode = generateCode();
   myRole = 'host';
   
-  // تجهيز الأسئلة
   let qs = shuffleArray([...BIBLE_QUESTIONS]).slice(0, totalRounds);
   questionsList = [...qs];
   
@@ -828,7 +837,7 @@ function showLobby() {
     document.getElementById('p1-name').textContent = playerNames.p1;
     document.getElementById('p2-name').textContent = myName;
     document.getElementById('p2-dot').className = 'status-dot dot-ready';
-    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#9090b0;padding:20px">✅ جاهز! في انتظار المضيف...</div>';
+    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#06d6a0;padding:20px">✅ جاهز! في انتظار المضيف...</div>';
   }
 }
 
@@ -844,7 +853,6 @@ function listenToRoom() {
       return;
     }
     
-    // لاعب ثاني انضم
     if(myRole === 'host' && room.guest && !playerNames.p2) {
       playerNames.p2 = room.guest;
       document.getElementById('p2-name').textContent = room.guest;
@@ -854,7 +862,6 @@ function listenToRoom() {
       showNotification(`${room.guest} انضم! ابدأ اللعبة`, 'success');
     }
     
-    // بدء اللعبة
     if(room.status === 'playing' && !isGameActive) {
       scores = room.scores || { p1: 0, p2: 0 };
       playerNames.p1 = room.host;
@@ -862,7 +869,6 @@ function listenToRoom() {
       startGameUI();
     }
     
-    // انتهاء اللعبة
     if(room.status === 'finished' && isGameActive) {
       showResultScreen(room.scores);
     }
@@ -871,7 +877,6 @@ function listenToRoom() {
 
 // ==================== بدء اللعبة ====================
 async function startGame() {
-  // إعادة تعيين المتغيرات
   scores = { p1: 0, p2: 0 };
   currentRound = 0;
   
@@ -900,23 +905,29 @@ function startGameUI() {
   document.getElementById('score-p1').textContent = '0';
   document.getElementById('score-p2').textContent = '0';
   document.getElementById('round-num').textContent = `0/${totalRounds}`;
-  document.getElementById('q-text').textContent = 'جاري تجهيز السؤال الأول...';
+  document.getElementById('q-text').innerHTML = '✨ جاري تجهيز السؤال الأول ✨';
+  document.getElementById('choices-container').innerHTML = '';
   
-  // تنظيف المستمعين السابقين
   if(currentQuestionListener) currentQuestionListener.off();
   if(roundResultListener) roundResultListener.off();
   
-  // استماع للسؤال الجديد
+  // استماع للسؤال الجديد - ده بيشتغل عند الاتنين
   currentQuestionListener = db.ref(`rooms/${roomCode}/currentQuestion`);
   currentQuestionListener.on('value', (snapshot) => {
     const data = snapshot.val();
+    console.log('تم استلام سؤال جديد:', data);
+    
     if(data && data.round !== currentRound && !waitingForNext) {
       currentQuestion = data.question;
       currentRound = data.round;
       answered = false;
       doubleActive = false;
+      
+      console.log('عرض السؤال رقم', currentRound, ':', currentQuestion.q);
       document.getElementById('round-num').textContent = `${currentRound}/${totalRounds}`;
       displayQuestion();
+      
+      if(timerInterval) clearInterval(timerInterval);
       startTimer(30);
     }
   });
@@ -926,6 +937,7 @@ function startGameUI() {
   roundResultListener.on('value', (snapshot) => {
     const data = snapshot.val();
     if(data) {
+      console.log('نتيجة الجولة:', data);
       scores = data.scores;
       updateScoresUI();
       highlightAnswer(data.correctAnswer);
@@ -946,7 +958,7 @@ function startGameUI() {
   
   listenToChat();
   
-  // المضيف يبدأ السؤال الأول فوراً
+  // المضيف يبدأ السؤال الأول
   if(myRole === 'host') {
     setTimeout(() => {
       console.log('المضيف يبدأ السؤال الأول');
@@ -957,17 +969,17 @@ function startGameUI() {
 
 // ==================== الأسئلة ====================
 async function nextQuestion() {
-  console.log('nextQuestion called, questions left:', questionsList.length);
+  console.log('nextQuestion - الأسئلة المتبقية:', questionsList.length);
   
   if(!questionsList.length) {
-    console.log('لا يوجد أسئلة متبقية، إنهاء اللعبة');
+    console.log('انتهت الأسئلة');
     await db.ref(`rooms/${roomCode}`).update({ status: 'finished', scores: scores });
     return;
   }
   
   currentRound++;
   const question = questionsList.shift();
-  console.log('إرسال السؤال رقم', currentRound, ':', question.q);
+  console.log('إرسال السؤال رقم', currentRound);
   
   try {
     await db.ref(`rooms/${roomCode}/currentQuestion`).set({
@@ -983,16 +995,17 @@ async function nextQuestion() {
 
 function displayQuestion() {
   if(!currentQuestion) {
-    console.log('لا يوجد سؤال حالي');
+    console.log('لا يوجد سؤال للعرض');
     return;
   }
   
-  console.log('عرض السؤال:', currentQuestion.q);
   document.getElementById('q-text').innerHTML = currentQuestion.q;
   
-  // تحديد من دوره (السؤال الأول للمضيف، الثاني للضيف، وهكذا)
   const isHostTurn = (currentRound % 2 === 1);
   const isMyTurn = (myRole === 'host' && isHostTurn) || (myRole === 'guest' && !isHostTurn);
+  
+  console.log('دور اللاعب:', isMyTurn ? 'دوري' : 'دور الخصم');
+  console.log('اللاعب المضيف:', playerNames.p1, 'الضيف:', playerNames.p2);
   
   document.getElementById('player1-card').classList.toggle('active', myRole === 'host' && isMyTurn);
   document.getElementById('player2-card').classList.toggle('active', myRole === 'guest' && isMyTurn);
@@ -1001,11 +1014,11 @@ function displayQuestion() {
   container.innerHTML = '';
   
   if(!isMyTurn) {
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:#9090b0">⏳ دور الخصم...</div>';
+    container.innerHTML = '<div class="waiting-turn">⏳ في انتظار إجابة الخصم...</div>';
     return;
   }
   
-  // عرض الأزرار للمستخدم الحالي
+  // عرض الأزرار للاعب صاحب الدور
   currentQuestion.c.forEach(choice => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
@@ -1030,8 +1043,10 @@ function submitAnswer(answer) {
     scores.p2 += points;
   }
   
-  document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
-  showNotification(isCorrect ? `✅ صحيح! +${points}` : `❌ خطأ! الإجابة الصحيحة: ${currentQuestion.a}`, isCorrect ? 'success' : 'error');
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(btn => btn.disabled = true);
+  
+  showNotification(isCorrect ? `✅ صحيح! +${points}` : `❌ خطأ! الإجابة: ${currentQuestion.a}`, isCorrect ? 'success' : 'error');
   
   const gameOver = (currentRound >= totalRounds || questionsList.length === 0);
   
@@ -1049,11 +1064,11 @@ function submitAnswer(answer) {
 }
 
 function highlightAnswer(correctAnswer) {
-  const buttons = document.querySelectorAll('.choice-btn');
-  buttons.forEach(btn => {
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(btn => {
     if(btn.textContent === correctAnswer) {
       btn.classList.add('correct');
-    } else if(btn.textContent !== correctAnswer && btn.textContent !== '⏳ دور الخصم...') {
+    } else if(btn.textContent !== correctAnswer && btn.textContent !== '⏳ في انتظار إجابة الخصم...') {
       btn.classList.add('wrong');
     }
   });
@@ -1086,7 +1101,9 @@ function startTimer(seconds) {
       clearInterval(timerInterval);
       answered = true;
       showNotification('⏰ انتهى الوقت!', 'error');
-      document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
+      
+      const btns = document.querySelectorAll('.choice-btn');
+      btns.forEach(btn => btn.disabled = true);
       
       const gameOver = (currentRound >= totalRounds || questionsList.length === 0);
       db.ref(`rooms/${roomCode}/roundResult`).set({
@@ -1128,9 +1145,9 @@ async function useHint() {
   hintUsed = true;
   document.getElementById('hint-btn').disabled = true;
   
-  const buttons = document.querySelectorAll('.choice-btn');
-  const wrongButtons = Array.from(buttons).filter(btn => btn.textContent !== currentQuestion?.a);
-  const toRemove = wrongButtons.slice(0, Math.floor(wrongButtons.length / 2));
+  const btns = document.querySelectorAll('.choice-btn');
+  const wrongBtns = Array.from(btns).filter(btn => btn.textContent !== currentQuestion?.a);
+  const toRemove = wrongBtns.slice(0, Math.floor(wrongBtns.length / 2));
   toRemove.forEach(btn => {
     btn.style.opacity = '0.3';
     btn.disabled = true;
