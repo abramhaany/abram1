@@ -157,11 +157,6 @@ input:focus {
   background: rgba(6,214,160,0.1);
 }
 
-.player-card.waiting {
-  border-color: #ffd166;
-  background: rgba(255,209,102,0.05);
-}
-
 .player-name {
   font-size: 12px;
   color: #9090b0;
@@ -175,10 +170,6 @@ input:focus {
 
 .player-score.green {
   color: #06d6a0;
-}
-
-.player-score.red {
-  color: #ef4565;
 }
 
 .round-info {
@@ -431,15 +422,6 @@ input:focus {
   margin-bottom: 20px;
 }
 
-.final-score-item {
-  text-align: center;
-}
-
-.final-score-name {
-  font-size: 12px;
-  color: #9090b0;
-}
-
 .final-score-value {
   font-size: 32px;
   font-weight: 900;
@@ -516,16 +498,10 @@ input:focus {
   margin-bottom: 10px;
 }
 
-.waiting-indicator {
-  text-align: center;
-  padding: 30px;
-  color: #ffd166;
-}
-
 .answer-status {
-  font-size: 12px;
+  font-size: 11px;
   margin-top: 5px;
-  color: #06d6a0;
+  color: #ffd166;
 }
 </style>
 </head>
@@ -651,7 +627,7 @@ const firebaseConfig = {
   appId: "1:959500982230:web:0e292eec3297e363e77677"
 };
 
-// ==================== أسئلة الكتاب المقدس ====================
+// ==================== الأسئلة ====================
 const BIBLE_QUESTIONS = [
   { q: "كم عدد أسفار العهد القديم (البروتستانتي)؟", c: ["36", "39", "42", "45"], a: "39" },
   { q: "من هو أول إنسان خُلق؟", c: ["نوح", "إبراهيم", "آدم", "موسى"], a: "آدم" },
@@ -665,9 +641,7 @@ const BIBLE_QUESTIONS = [
   { q: "قصة داود وجليات في أي سفر؟", c: ["التكوين", "المزامير", "صموئيل أول", "الملوك أول"], a: "صموئيل أول" },
   { q: "من هو الملك الذي بنى الهيكل؟", c: ["شاؤول", "داود", "سليمان", "حزقيا"], a: "سليمان" },
   { q: "كم سنة جال بنو إسرائيل في البرية؟", c: ["20", "40", "60", "80"], a: "40" },
-  { q: "من الذي أكلته الحوت الكبير؟", c: ["إيليا", "صموئيل", "يونان", "إرميا"], a: "يونان" },
-  { q: "أي من هؤلاء ليس من تلاميذ يسوع؟", c: ["بطرس", "يوحنا", "متى", "بولس"], a: "بولس" },
-  { q: "ماذا يسمى أول أسفار العهد الجديد؟", c: ["مرقس", "لوقا", "متى", "يوحنا"], a: "متى" }
+  { q: "من الذي أكلته الحوت الكبير؟", c: ["إيليا", "صموئيل", "يونان", "إرميا"], a: "يونان" }
 ];
 
 function shuffleArray(arr) {
@@ -678,31 +652,28 @@ function shuffleArray(arr) {
   return arr;
 }
 
-// ==================== متغيرات ====================
+// ==================== المتغيرات العامة ====================
 let db;
 let myName = '';
-let myRole = '';
+let myRole = ''; // 'host' or 'guest'
 let roomCode = '';
 let roomListener = null;
-let gameStartedListener = null;
-let currentQuestionListener = null;
-let roundResultListener = null;
+let gameListener = null;
 let chatListener = null;
 let timerInterval = null;
 
-let currentQuestion = null;
+let currentQuestionObj = null;
 let currentRound = 0;
 let totalRounds = 10;
 let scores = { p1: 0, p2: 0 };
 let playerNames = { p1: '', p2: '' };
-let questionsList = [];
+let questionsRemaining = [];
 let hasAnswered = false;
 let hintUsed = false;
 let waitingForNext = false;
 let isGameActive = false;
-let answersGiven = { p1: false, p2: false };
 
-// ==================== تهيئة ====================
+// ==================== التهيئة ====================
 function initFirebase() {
   try {
     firebase.initializeApp(firebaseConfig);
@@ -710,7 +681,7 @@ function initFirebase() {
     console.log('✅ Firebase connected');
   } catch(e) {
     console.error('Firebase error:', e);
-    alert('فشل الاتصال');
+    alert('فشل الاتصال بقاعدة البيانات');
   }
 }
 initFirebase();
@@ -745,8 +716,8 @@ async function createRoom() {
   roomCode = generateCode();
   myRole = 'host';
   
-  let qs = shuffleArray([...BIBLE_QUESTIONS]).slice(0, totalRounds);
-  questionsList = [...qs];
+  const shuffledQuestions = shuffleArray([...BIBLE_QUESTIONS]);
+  questionsRemaining = shuffledQuestions.slice(0, totalRounds);
   
   const roomData = {
     host: myName,
@@ -755,10 +726,8 @@ async function createRoom() {
     scores: { p1: 0, p2: 0 },
     currentRound: 0,
     totalRounds: totalRounds,
-    questions: qs,
-    createdAt: Date.now(),
-    gameReady: false,
-    roundActive: false
+    questions: questionsRemaining,
+    createdAt: Date.now()
   };
   
   try {
@@ -766,7 +735,7 @@ async function createRoom() {
     playerNames.p1 = myName;
     showLobby();
     listenToRoom();
-    showNotification(`✅ الكود: ${roomCode}`, 'success');
+    showNotification(`✅ تم إنشاء الغرفة! الكود: ${roomCode}`, 'success');
   } catch(e) { showNotification('خطأ: ' + e.message, 'error'); }
 }
 
@@ -783,25 +752,25 @@ async function joinRoom() {
     const roomData = snapshot.val();
     
     if(!roomData) { showNotification('غرفة غير موجودة', 'error'); return; }
-    if(roomData.guest) { showNotification('ممتلئة', 'error'); return; }
-    if(roomData.status !== 'waiting') { showNotification('بدأت', 'error'); return; }
+    if(roomData.guest) { showNotification('الغرفة ممتلئة', 'error'); return; }
+    if(roomData.status !== 'waiting') { showNotification('اللعبة بدأت بالفعل', 'error'); return; }
     
     roomCode = code;
     myRole = 'guest';
     playerNames.p1 = roomData.host;
     playerNames.p2 = myName;
     totalRounds = roomData.totalRounds || 10;
-    questionsList = [...(roomData.questions || [])];
+    questionsRemaining = [...(roomData.questions || [])];
     
-    await db.ref(`rooms/${roomCode}`).update({ guest: myName, status: 'ready' });
+    await db.ref(`rooms/${roomCode}`).update({ guest: myName });
     
     showLobby();
     listenToRoom();
-    showNotification('✅ انضممت!', 'success');
+    showNotification('✅ انضممت إلى الغرفة!', 'success');
   } catch(e) { showNotification('خطأ: ' + e.message, 'error'); }
 }
 
-// ==================== لوبي ====================
+// ==================== اللوبي ====================
 function showLobby() {
   showScreen('lobby');
   document.getElementById('room-code-display').textContent = roomCode;
@@ -809,11 +778,12 @@ function showLobby() {
   if(myRole === 'host') {
     document.getElementById('p1-name').textContent = myName;
     document.getElementById('p1-dot').className = 'status-dot dot-ready';
+    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#ffd166;padding:20px">⏳ في انتظار انضمام صديق...</div>';
   } else {
     document.getElementById('p1-name').textContent = playerNames.p1;
     document.getElementById('p2-name').textContent = myName;
     document.getElementById('p2-dot').className = 'status-dot dot-ready';
-    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#06d6a0;padding:20px">✅ جاهز! في انتظار المضيف...</div>';
+    document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="color:#06d6a0;padding:20px">✅ جاهز! في انتظار بدء المضيف...</div>';
   }
 }
 
@@ -825,22 +795,28 @@ function listenToRoom() {
     const room = snapshot.val();
     if(!room) { showNotification('تم حذف الغرفة', 'error'); goHome(); return; }
     
+    // تحديث إذا انضم الضيف (للمضيف)
     if(myRole === 'host' && room.guest && !playerNames.p2) {
       playerNames.p2 = room.guest;
       document.getElementById('p2-name').textContent = room.guest;
       document.getElementById('p2-dot').className = 'status-dot dot-ready';
       document.getElementById('lobby-waiting').classList.add('hidden');
       document.getElementById('lobby-start').classList.remove('hidden');
-      showNotification(`${room.guest} انضم!`, 'success');
+      showNotification(`${room.guest} انضم إلى الغرفة!`, 'success');
     }
     
+    // بدء اللعبة
     if(room.status === 'playing' && !isGameActive) {
       scores = room.scores || { p1: 0, p2: 0 };
       playerNames.p1 = room.host;
       playerNames.p2 = room.guest;
+      if(room.questions && room.questions.length > 0) {
+        questionsRemaining = [...room.questions];
+      }
       startGameUI();
     }
     
+    // انتهاء اللعبة
     if(room.status === 'finished' && isGameActive) {
       showResultScreen(room.scores);
     }
@@ -858,88 +834,66 @@ async function startGame() {
     scores: { p1: 0, p2: 0 }
   });
   
+  // إرسال أول سؤال بعد تأخير بسيط
   setTimeout(() => {
-    if(myRole === 'host') {
-      sendFirstQuestion();
-    }
+    sendNextQuestion();
   }, 1000);
 }
 
-async function sendFirstQuestion() {
-  if(!questionsList.length) return;
+async function sendNextQuestion() {
+  if(!questionsRemaining.length) {
+    await db.ref(`rooms/${roomCode}`).update({ status: 'finished', scores: scores });
+    return;
+  }
   
-  currentRound = 1;
-  const question = questionsList.shift();
-  answersGiven = { p1: false, p2: false };
+  currentRound++;
+  const question = questionsRemaining.shift();
+  
+  const questionData = {
+    q: question.q,
+    c: question.c,
+    a: question.a,
+    round: currentRound,
+    startTime: Date.now()
+  };
   
   await db.ref(`rooms/${roomCode}`).update({
-    currentQuestion: {
-      question: question,
-      round: 1,
-      startTime: Date.now(),
-      answersGiven: { p1: false, p2: false }
-    },
-    roundActive: true
+    currentQuestion: questionData,
+    roundActive: true,
+    roundResult: null,
+    [`answersGiven`]: { p1: false, p2: false }
   });
+  
+  // تحديث قائمة الأسئلة المتبقية في قاعدة البيانات
+  await db.ref(`rooms/${roomCode}/questions`).set(questionsRemaining);
 }
 
+// ==================== واجهة اللعبة ====================
 function startGameUI() {
   isGameActive = true;
   showScreen('game');
   
-  currentRound = 0;
-  scores = { p1: 0, p2: 0 };
   hasAnswered = false;
   hintUsed = false;
   waitingForNext = false;
-  answersGiven = { p1: false, p2: false };
   
   document.getElementById('name-p1').textContent = playerNames.p1;
   document.getElementById('name-p2').textContent = playerNames.p2;
-  document.getElementById('score-p1').textContent = '0';
-  document.getElementById('score-p2').textContent = '0';
+  document.getElementById('score-p1').textContent = scores.p1;
+  document.getElementById('score-p2').textContent = scores.p2;
   document.getElementById('round-num').textContent = `0/${totalRounds}`;
-  document.getElementById('q-text').innerHTML = '⏳ جاري تجهيز السؤال الأول...';
+  document.getElementById('q-text').innerHTML = '⏳ جاري تحميل السؤال الأول...';
   document.getElementById('choices-container').innerHTML = '';
   document.getElementById('p1-status').innerHTML = '';
   document.getElementById('p2-status').innerHTML = '';
+  document.getElementById('hint-btn').disabled = false;
   
-  // مستمع السؤال
-  if(currentQuestionListener) currentQuestionListener.off();
-  currentQuestionListener = db.ref(`rooms/${roomCode}`);
-  currentQuestionListener.on('value', (snapshot) => {
+  // مستمع تغييرات الغرفة
+  if(gameListener) gameListener.off();
+  gameListener = db.ref(`rooms/${roomCode}`);
+  gameListener.on('value', async (snapshot) => {
     const room = snapshot.val();
     if(!room) return;
-    
-    const qData = room.currentQuestion;
-    
-    if(qData && qData.round !== currentRound && !waitingForNext && room.roundActive) {
-      currentQuestion = qData.question;
-      currentRound = qData.round;
-      hasAnswered = false;
-      hintUsed = false;
-      answersGiven = qData.answersGiven || { p1: false, p2: false };
-      
-      document.getElementById('hint-btn').disabled = false;
-      document.getElementById('round-num').textContent = `${currentRound}/${totalRounds}`;
-      document.getElementById('q-text').innerHTML = currentQuestion.q;
-      
-      updateAnswerStatus();
-      
-      const container = document.getElementById('choices-container');
-      container.innerHTML = '';
-      
-      currentQuestion.c.forEach(choice => {
-        const btn = document.createElement('button');
-        btn.className = 'choice-btn';
-        btn.textContent = choice;
-        btn.onclick = () => submitAnswer(choice);
-        container.appendChild(btn);
-      });
-      
-      if(timerInterval) clearInterval(timerInterval);
-      startTimer(30);
-    }
     
     // تحديث النتائج
     if(room.scores) {
@@ -947,79 +901,69 @@ function startGameUI() {
       document.getElementById('score-p1').textContent = scores.p1;
       document.getElementById('score-p2').textContent = scores.p2;
     }
-  });
-  
-  // مستمع النتائج والإجابات
-  if(roundResultListener) roundResultListener.off();
-  roundResultListener = db.ref(`rooms/${roomCode}/roundResult`);
-  roundResultListener.on('value', (snapshot) => {
-    const data = snapshot.val();
-    if(data && data.round === currentRound && !waitingForNext) {
-      // عرض الإجابة الصحيحة
-      const btns = document.querySelectorAll('.choice-btn');
-      btns.forEach(btn => {
-        if(btn.textContent === data.correctAnswer) {
-          btn.classList.add('correct-highlight');
-        }
-        btn.disabled = true;
-      });
-      
-      // عرض النتيجة
-      const myAnswered = (myRole === 'host' && data.p1Answered) || (myRole === 'guest' && data.p2Answered);
-      const myCorrect = (myRole === 'host' && data.p1Correct) || (myRole === 'guest' && data.p2Correct);
-      
-      if(myAnswered) {
-        if(myCorrect) showNotification(`✅ إجابة صحيحة! +${data.p1Earned || data.p2Earned || 10} نقطة`, 'success');
-        else showNotification(`❌ خطأ! الإجابة الصحيحة: ${data.correctAnswer}`, 'error');
-      }
-      
-      waitingForNext = true;
-      setTimeout(() => {
-        waitingForNext = false;
-        if(myRole === 'host') {
-          nextQuestion();
-        }
-      }, 3000);
+    
+    // سؤال جديد
+    const qData = room.currentQuestion;
+    if(qData && qData.round !== currentRound && !waitingForNext && room.roundActive !== false) {
+      loadNewQuestion(qData, room.answersGiven || { p1: false, p2: false });
+    }
+    
+    // نتيجة الجولة
+    if(room.roundResult && room.roundResult.round === currentRound && !waitingForNext) {
+      handleRoundResult(room.roundResult);
+    }
+    
+    // تحديث حالة الإجابات
+    if(room.answersGiven) {
+      updateAnswersStatus(room.answersGiven);
     }
   });
   
   listenToChat();
 }
 
-function updateAnswerStatus() {
+function loadNewQuestion(qData, answersGiven) {
+  currentQuestionObj = qData;
+  currentRound = qData.round;
+  hasAnswered = answersGiven[myRole === 'host' ? 'p1' : 'p2'] || false;
+  hintUsed = false;
+  
+  document.getElementById('round-num').textContent = `${currentRound}/${totalRounds}`;
+  document.getElementById('q-text').innerHTML = qData.q;
+  document.getElementById('hint-btn').disabled = hasAnswered;
+  
+  // بناء أزرار الإجابات
+  const container = document.getElementById('choices-container');
+  container.innerHTML = '';
+  
+  if(hasAnswered) {
+    container.innerHTML = '<div class="text-center" style="padding:20px;color:#06d6a0">✓ تمت الإجابة على هذا السؤال</div>';
+  } else {
+    qData.c.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice;
+      btn.onclick = () => submitAnswer(choice);
+      container.appendChild(btn);
+    });
+  }
+  
+  updateAnswersStatus(answersGiven);
+  startTimer(30);
+}
+
+function updateAnswersStatus(answersGiven) {
   if(myRole === 'host') {
-    document.getElementById('p1-status').innerHTML = answersGiven.p1 ? '✓ تمت الإجابة' : '⏳ لم يجب بعد';
-    document.getElementById('p2-status').innerHTML = answersGiven.p2 ? '✓ تمت الإجابة' : '⏳ لم يجب بعد';
+    document.getElementById('p1-status').innerHTML = answersGiven.p1 ? '✓ أجبت' : '⏳ لم تجب بعد';
+    document.getElementById('p2-status').innerHTML = answersGiven.p2 ? '✓ أجاب الخصم' : '⏳ الخصم لم يجب';
     document.getElementById('player1-card').classList.toggle('answered', answersGiven.p1);
     document.getElementById('player2-card').classList.toggle('answered', answersGiven.p2);
   } else {
-    document.getElementById('p1-status').innerHTML = answersGiven.p1 ? '✓ أجاب' : '⏳ ينتظر';
+    document.getElementById('p1-status').innerHTML = answersGiven.p1 ? '✓ أجاب الخصم' : '⏳ الخصم لم يجب';
     document.getElementById('p2-status').innerHTML = answersGiven.p2 ? '✓ أجبت' : '⏳ لم تجب بعد';
     document.getElementById('player1-card').classList.toggle('answered', answersGiven.p1);
     document.getElementById('player2-card').classList.toggle('answered', answersGiven.p2);
   }
-}
-
-async function nextQuestion() {
-  if(!questionsList.length) {
-    await db.ref(`rooms/${roomCode}`).update({ status: 'finished', scores: scores });
-    return;
-  }
-  
-  currentRound++;
-  const question = questionsList.shift();
-  answersGiven = { p1: false, p2: false };
-  
-  await db.ref(`rooms/${roomCode}`).update({
-    currentQuestion: {
-      question: question,
-      round: currentRound,
-      startTime: Date.now(),
-      answersGiven: { p1: false, p2: false }
-    },
-    roundActive: true,
-    roundResult: null
-  });
 }
 
 async function submitAnswer(answer) {
@@ -1030,47 +974,50 @@ async function submitAnswer(answer) {
   const qData = room.currentQuestion;
   
   if(!qData || qData.round !== currentRound) return;
-  if(qData.answersGiven && qData.answersGiven[myRole === 'host' ? 'p1' : 'p2']) return;
+  if(room.answersGiven && room.answersGiven[myRole === 'host' ? 'p1' : 'p2']) return;
   
   hasAnswered = true;
   if(timerInterval) clearInterval(timerInterval);
   
-  const isCorrect = (answer === currentQuestion.a);
-  const points = isCorrect ? 10 : 0;
+  const isCorrect = (answer === qData.a);
+  const pointsEarned = isCorrect ? 10 : 0;
+  const answerKey = myRole === 'host' ? 'p1' : 'p2';
   
   // تحديث النتيجة المحلية
-  if(myRole === 'host') scores.p1 += points;
-  else scores.p2 += points;
+  if(myRole === 'host') scores.p1 += pointsEarned;
+  else scores.p2 += pointsEarned;
   
-  // تحديث حالة الإجابات
-  const answerKey = myRole === 'host' ? 'p1' : 'p2';
-  const newAnswersGiven = { ...(qData.answersGiven || { p1: false, p2: false }) };
+  // تحديث قاعدة البيانات
+  const newAnswersGiven = { ...(room.answersGiven || { p1: false, p2: false }) };
   newAnswersGiven[answerKey] = true;
   
   await db.ref(`rooms/${roomCode}`).update({
-    [`currentQuestion/answersGiven/${answerKey}`]: true,
+    [`answersGiven/${answerKey}`]: true,
     scores: scores
   });
   
+  showNotification(isCorrect ? `✅ صحيح! +${pointsEarned} نقطة` : `❌ خطأ! الإجابة الصحيحة: ${qData.a}`, isCorrect ? 'success' : 'error');
+  
+  // تعطيل الأزرار
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(btn => btn.disabled = true);
+  document.getElementById('hint-btn').disabled = true;
+  
   // التحقق مما إذا كان كلا اللاعبين قد أجابا
   const bothAnswered = newAnswersGiven.p1 && newAnswersGiven.p2;
-  const isGameOver = (currentRound >= totalRounds || questionsList.length === 0);
+  const isGameOver = (currentRound >= totalRounds || questionsRemaining.length === 0);
   
   if(bothAnswered || isGameOver) {
-    // إلغاء التايمر وحفظ نتيجة الجولة
-    const finalP1Correct = newAnswersGiven.p1 ? (await getUserAnswer(myRole === 'host' ? 'p1' : 'p2', answer, isCorrect)) : false;
-    const finalP2Correct = newAnswersGiven.p2 ? (await getUserAnswer(myRole === 'host' ? 'p2' : 'p1', null, false)) : false;
-    
+    // تسجيل نتيجة الجولة
     await db.ref(`rooms/${roomCode}/roundResult`).set({
       round: currentRound,
-      correctAnswer: currentQuestion.a,
+      correctAnswer: qData.a,
       p1Answered: newAnswersGiven.p1,
       p2Answered: newAnswersGiven.p2,
-      p1Correct: newAnswersGiven.p1 ? (myRole === 'host' ? isCorrect : false) : false,
-      p2Correct: newAnswersGiven.p2 ? (myRole === 'guest' ? isCorrect : false) : false,
-      p1Earned: newAnswersGiven.p1 && (myRole === 'host' ? points : 0),
-      p2Earned: newAnswersGiven.p2 && (myRole === 'guest' ? points : 0),
-      gameOver: isGameOver,
+      p1Correct: newAnswersGiven.p1 && (myRole === 'host' ? isCorrect : false),
+      p2Correct: newAnswersGiven.p2 && (myRole === 'guest' ? isCorrect : false),
+      p1Earned: newAnswersGiven.p1 && (myRole === 'host' ? pointsEarned : 0),
+      p2Earned: newAnswersGiven.p2 && (myRole === 'guest' ? pointsEarned : 0),
       timestamp: Date.now()
     });
     
@@ -1080,16 +1027,27 @@ async function submitAnswer(answer) {
       await db.ref(`rooms/${roomCode}`).update({ status: 'finished', scores: scores });
     }
   }
-  
-  // تعطيل الأزرار
-  const btns = document.querySelectorAll('.choice-btn');
-  btns.forEach(btn => btn.disabled = true);
-  document.getElementById('hint-btn').disabled = true;
 }
 
-async function getUserAnswer(player, answer, isCorrect) {
-  // مساعدة للحصول على إجابة اللاعب الآخر
-  return isCorrect;
+function handleRoundResult(result) {
+  waitingForNext = true;
+  
+  // إظهار الإجابة الصحيحة
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(btn => {
+    if(btn.textContent === result.correctAnswer) {
+      btn.classList.add('correct-highlight');
+    }
+    btn.disabled = true;
+  });
+  
+  // الانتقال للسؤال التالي
+  setTimeout(() => {
+    waitingForNext = false;
+    if(myRole === 'host') {
+      sendNextQuestion();
+    }
+  }, 2500);
 }
 
 function startTimer(seconds) {
@@ -1112,53 +1070,51 @@ function startTimer(seconds) {
     if(timeLeft <= 8) fill.classList.add('danger');
     else if(timeLeft <= 15) fill.classList.add('warning');
     
-    if(timeLeft <= 0 && !hasAnswered) {
+    if(timeLeft <= 0 && !hasAnswered && isGameActive) {
       clearInterval(timerInterval);
-      hasAnswered = true;
       
-      // انتهى الوقت بدون إجابة
       const roomSnap = await db.ref(`rooms/${roomCode}`).once('value');
       const room = roomSnap.val();
       const qData = room.currentQuestion;
+      const answersGiven = room.answersGiven || { p1: false, p2: false };
+      const myKey = myRole === 'host' ? 'p1' : 'p2';
       
-      if(qData && qData.round === currentRound) {
-        const answerKey = myRole === 'host' ? 'p1' : 'p2';
-        if(!qData.answersGiven || !qData.answersGiven[answerKey]) {
-          const newAnswersGiven = { ...(qData.answersGiven || { p1: false, p2: false }) };
-          newAnswersGiven[answerKey] = true;
-          
-          await db.ref(`rooms/${roomCode}`).update({
-            [`currentQuestion/answersGiven/${answerKey}`]: true
+      if(qData && qData.round === currentRound && !answersGiven[myKey]) {
+        hasAnswered = true;
+        
+        const newAnswersGiven = { ...answersGiven };
+        newAnswersGiven[myKey] = true;
+        
+        await db.ref(`rooms/${roomCode}`).update({
+          [`answersGiven/${myKey}`]: true
+        });
+        
+        showNotification('⏰ انتهى الوقت! 0 نقطة', 'error');
+        
+        const btns = document.querySelectorAll('.choice-btn');
+        btns.forEach(btn => btn.disabled = true);
+        document.getElementById('hint-btn').disabled = true;
+        
+        const bothAnswered = newAnswersGiven.p1 && newAnswersGiven.p2;
+        const isGameOver = (currentRound >= totalRounds || questionsRemaining.length === 0);
+        
+        if(bothAnswered || isGameOver) {
+          await db.ref(`rooms/${roomCode}/roundResult`).set({
+            round: currentRound,
+            correctAnswer: qData.a,
+            p1Answered: newAnswersGiven.p1,
+            p2Answered: newAnswersGiven.p2,
+            p1Correct: false,
+            p2Correct: false,
+            p1Earned: 0,
+            p2Earned: 0,
+            timestamp: Date.now()
           });
           
-          showNotification('⏰ انتهى الوقت! 0 نقطة', 'error');
+          await db.ref(`rooms/${roomCode}`).update({ roundActive: false });
           
-          const btns = document.querySelectorAll('.choice-btn');
-          btns.forEach(btn => btn.disabled = true);
-          document.getElementById('hint-btn').disabled = true;
-          
-          const bothAnswered = newAnswersGiven.p1 && newAnswersGiven.p2;
-          const isGameOver = (currentRound >= totalRounds || questionsList.length === 0);
-          
-          if(bothAnswered || isGameOver) {
-            await db.ref(`rooms/${roomCode}/roundResult`).set({
-              round: currentRound,
-              correctAnswer: currentQuestion.a,
-              p1Answered: newAnswersGiven.p1,
-              p2Answered: newAnswersGiven.p2,
-              p1Correct: false,
-              p2Correct: false,
-              p1Earned: 0,
-              p2Earned: 0,
-              gameOver: isGameOver,
-              timestamp: Date.now()
-            });
-            
-            await db.ref(`rooms/${roomCode}`).update({ roundActive: false });
-            
-            if(isGameOver) {
-              await db.ref(`rooms/${roomCode}`).update({ status: 'finished', scores: scores });
-            }
+          if(isGameOver) {
+            await db.ref(`rooms/${roomCode}`).update({ status: 'finished', scores: scores });
           }
         }
       }
@@ -1166,24 +1122,24 @@ function startTimer(seconds) {
   }, 1000);
 }
 
-// ==================== قدرات ====================
+// ==================== القدرات ====================
 async function useHint() {
   if(hintUsed || hasAnswered) return;
   hintUsed = true;
   document.getElementById('hint-btn').disabled = true;
   
   const btns = document.querySelectorAll('.choice-btn');
-  const correctAnswer = currentQuestion.a;
+  const correctAnswer = currentQuestionObj.a;
   const wrongBtns = Array.from(btns).filter(btn => btn.textContent !== correctAnswer);
   const toRemove = wrongBtns.slice(0, Math.floor(wrongBtns.length / 2));
   toRemove.forEach(btn => {
     btn.style.opacity = '0.3';
     btn.disabled = true;
   });
-  showNotification('💡 حذف إجابتين خاطئتين', 'info');
+  showNotification('💡 تم حذف إجابتين خاطئتين', 'info');
 }
 
-// ==================== شات ====================
+// ==================== الشات ====================
 function listenToChat() {
   if(chatListener) chatListener.off();
   chatListener = db.ref(`rooms/${roomCode}/chat`);
@@ -1212,7 +1168,7 @@ async function sendReaction(emoji) {
   await db.ref(`rooms/${roomCode}/chat`).push({ sender: myName, text: emoji, timestamp: Date.now() });
 }
 
-// ==================== خروج ونتيجة ====================
+// ==================== الخروج والنتائج ====================
 function showResultScreen(finalScores) {
   isGameActive = false;
   if(timerInterval) clearInterval(timerInterval);
@@ -1230,22 +1186,29 @@ function showResultScreen(finalScores) {
       <div class="result-title">${isTie ? 'تعادل!' : (isWin ? 'فزت!' : 'خسرت')}</div>
       <div class="result-sub">${isTie ? 'لعبة رائعة' : (isWin ? `${myScore} نقطة` : `${theirScore} نقطة`)}</div>
       <div class="final-scores">
-        <div><div>${playerNames.p1}</div><div class="final-score-value ${finalScores.p1 >= finalScores.p2 ? 'winner' : ''}">${finalScores.p1}</div></div>
-        <div><div>${playerNames.p2}</div><div class="final-score-value ${finalScores.p2 >= finalScores.p1 ? 'winner' : ''}">${finalScores.p2}</div></div>
+        <div class="final-score-item">
+          <div class="final-score-name">${playerNames.p1}</div>
+          <div class="final-score-value ${finalScores.p1 >= finalScores.p2 ? 'winner' : ''}">${finalScores.p1}</div>
+        </div>
+        <div class="final-score-item">
+          <div class="final-score-name">${playerNames.p2}</div>
+          <div class="final-score-value ${finalScores.p2 >= finalScores.p1 ? 'winner' : ''}">${finalScores.p2}</div>
+        </div>
       </div>
-      <button class="btn btn-primary" onclick="location.reload()">🔄 جديد</button>
+      <button class="btn btn-primary" onclick="location.reload()">🔄 لعب مرة أخرى</button>
       <button class="btn btn-secondary" onclick="goHome()">🏠 الرئيسية</button>
     </div>
   `;
   document.body.appendChild(resultDiv);
 }
 
-function leaveGame() { if(confirm('مغادرة اللعبة؟')) goHome(); }
+function leaveGame() { 
+  if(confirm('هل تريد مغادرة اللعبة؟')) goHome(); 
+}
 
 function goHome() {
   if(roomListener) roomListener.off();
-  if(currentQuestionListener) currentQuestionListener.off();
-  if(roundResultListener) roundResultListener.off();
+  if(gameListener) gameListener.off();
   if(chatListener) chatListener.off();
   if(timerInterval) clearInterval(timerInterval);
   if(roomCode && db) db.ref(`rooms/${roomCode}`).remove().catch(e=>console.log(e));
@@ -1257,8 +1220,17 @@ function goHome() {
   document.getElementById('player-name').value = '';
 }
 
-async function leaveRoom() { if(confirm('مغادرة؟')) { if(roomCode && db) await db.ref(`rooms/${roomCode}`).remove().catch(e=>console.log(e)); goHome(); } }
-function copyCode() { navigator.clipboard.writeText(roomCode); showNotification('✅ تم النسخ', 'success'); }
+async function leaveRoom() { 
+  if(confirm('مغادرة الغرفة؟')) { 
+    if(roomCode && db) await db.ref(`rooms/${roomCode}`).remove().catch(e=>console.log(e)); 
+    goHome(); 
+  } 
+}
+
+function copyCode() { 
+  navigator.clipboard.writeText(roomCode); 
+  showNotification('✅ تم نسخ الكود', 'success'); 
+}
 </script>
 </body>
 </html>
