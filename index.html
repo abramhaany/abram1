@@ -284,30 +284,18 @@ label:first-child{margin-top:0}
 
 <script>
 // ════════════════════════════════════════════════════════
-//  Firebase Config — مشروع مجاني مخصص للعبة
+//  Firebase Config — تم تحديث الإعدادات الخاصة بك
 // ════════════════════════════════════════════════════════
-const firebaseConfig = {
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAZkQmg9k3RXoaCU3E2tP-jHcXIYwNpLJA",
   authDomain: "bero-a2b6b.firebaseapp.com",
+  databaseURL: "https://bero-a2b6b-default-rtdb.firebaseio.com",
   projectId: "bero-a2b6b",
   storageBucket: "bero-a2b6b.firebasestorage.app",
   messagingSenderId: "959500982230",
-  appId: "1:959500982230:web:c23a1b00de6e4f49e77677",
-  measurementId: "G-5SQNCZ5L2V"
+  appId: "1:959500982230:web:0e292eec3297e363e77677",
+  measurementId: "G-87GR9Q3F7N"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 // ──────────────────────────────────────────────────────
 //  تهيئة Firebase
@@ -320,10 +308,12 @@ function initFirebase(){
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
     firebaseReady = true;
-    console.log('Firebase connected');
+    console.log('Firebase connected successfully');
+    notif('✅ تم الاتصال بقاعدة البيانات بنجاح!', 'success', 3000);
   }catch(e){
-    console.warn('Firebase init failed, using demo mode:', e.message);
+    console.warn('Firebase init failed:', e.message);
     firebaseReady = false;
+    notif('⚠️ فشل الاتصال بقاعدة البيانات: '+e.message, 'error', 8000);
   }
 }
 initFirebase();
@@ -467,28 +457,38 @@ function setLoading(btnId, loading){
 // ════════════════════════════════════════════════════════
 //  Firebase helpers
 // ════════════════════════════════════════════════════════
-function fbSet(path, data){ return db.ref(path).set(data); }
-function fbGet(path){ return db.ref(path).once('value').then(s=>s.val()); }
-function fbUpdate(path, data){ return db.ref(path).update(data); }
+function fbSet(path, data){ 
+  if(!db) return Promise.reject('Firebase not ready');
+  return db.ref(path).set(data); 
+}
+function fbGet(path){ 
+  if(!db) return Promise.reject('Firebase not ready');
+  return db.ref(path).once('value').then(s=>s.val()); 
+}
+function fbUpdate(path, data){ 
+  if(!db) return Promise.reject('Firebase not ready');
+  return db.ref(path).update(data); 
+}
 function fbListen(path, cb){
+  if(!db) return null;
   const ref=db.ref(path);
   ref.on('value', snap=>cb(snap.val()));
   listeners.push(ref);
   return ref;
 }
 function fbListenNew(path, cb){
+  if(!db) return null;
   const ref=db.ref(path);
   let first=true;
   ref.on('child_added', snap=>{
     if(first){first=false;return;}
     cb(snap.val(), snap.key);
   });
-  // skip existing
   ref.once('value',()=>{first=false});
   listeners.push(ref);
   return ref;
 }
-function removeListeners(){listeners.forEach(r=>r.off());listeners=[];}
+function removeListeners(){listeners.forEach(r=>r&&r.off&&r.off());listeners=[];}
 
 // ════════════════════════════════════════════════════════
 //  إنشاء الغرفة
@@ -511,6 +511,7 @@ async function createRoom(){
       scores:{p1:0,p2:0}, curRound:0, ts:Date.now(),
       questions: qs
     });
+    names.p1=myName;
     showLobby();
     listenLobby();
   }catch(e){
@@ -564,7 +565,9 @@ function showLobby(){
   if(myRole==='guest'){
     document.getElementById('p2-name').textContent=myName;
     document.getElementById('p2-dot').className='status-dot dot-ready';
-    document.getElementById('lobby-msg').textContent='✅ متصل! في انتظار المضيف لبدء اللعبة...';
+    document.getElementById('lobby-msg').innerHTML='✅ متصل! في انتظار المضيف لبدء اللعبة...';
+  } else {
+    document.getElementById('lobby-msg').innerHTML='<div class="dot-loading"><span>•</span><span>•</span><span>•</span></div>في انتظار المنافس';
   }
 }
 
@@ -583,7 +586,7 @@ function listenLobby(){
       notif('✅ '+r.guest+' انضم! ابدأ اللعبة','success');
     }
     // المضيف بدأ اللعبة
-    if(r.status==='playing' && document.getElementById('screen-game').style.display==='none'){
+    if(r.status==='playing' && document.getElementById('screen-game').style.display!=='flex'){
       names.p1=r.host; names.p2=r.guest;
       scores={p1:r.scores?.p1||0, p2:r.scores?.p2||0};
       if(r.questions) qQueue=[...r.questions];
@@ -617,7 +620,7 @@ function startUI(){
   skipUsed=false; dblUsed=false; hintUsed=false;
   ['skip','double','hint'].forEach(id=>{
     const b=document.getElementById('pu-'+id);
-    b.disabled=false; b.classList.remove('used');
+    if(b){b.disabled=false; b.classList.remove('used');}
   });
   document.getElementById('chat-msgs').innerHTML='';
   updateBoard();
@@ -751,9 +754,10 @@ function updateBoard(){
   document.getElementById('sname1').textContent=names.p1||'اللاعب 1';
   document.getElementById('sname2').textContent=names.p2||'اللاعب 2';
   const e1=document.getElementById('spts1'), e2=document.getElementById('spts2');
-  e1.textContent=scores.p1; e2.textContent=scores.p2;
-  e1.className='p-pts '+(scores.p1>=scores.p2?'g':'r');
-  e2.className='p-pts '+(scores.p2>=scores.p1?'g':'r');
+  if(e1) e1.textContent=scores.p1; 
+  if(e2) e2.textContent=scores.p2;
+  if(e1) e1.className='p-pts '+(scores.p1>=scores.p2?'g':'r');
+  if(e2) e2.className='p-pts '+(scores.p2>=scores.p1?'g':'r');
 }
 
 // ════════════════════════════════════════════════════════
@@ -793,9 +797,10 @@ function applyHint(){
 //  الشات — Firebase
 // ════════════════════════════════════════════════════════
 function listenChat(){
+  if(!db) return;
   const chatRef=db.ref('rooms/'+roomCode+'/chat');
   // اقرأ آخر timestamp لتجنب عرض الرسائل القديمة
-  chatRef.limitToLast(1).once('value',snap=>{
+  chatRef.limitToLast(10).once('value',snap=>{
     snap.forEach(child=>{ lastChatKey=child.key; });
     // ابدأ الاستماع بعد آخر رسالة فقط
     const newRef=db.ref('rooms/'+roomCode+'/chat').orderByKey().startAfter(lastChatKey||'0');
@@ -818,9 +823,10 @@ async function react(e){
 }
 function addChat(txt,cls,from){
   const msgs=document.getElementById('chat-msgs');
+  if(!msgs) return;
   const d=document.createElement('div');
   d.className='chat-msg '+cls;
-  d.textContent=cls==='system'?(from?`${from}: ${txt}`:txt):txt;
+  d.textContent=txt;
   msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;
 }
 
@@ -860,7 +866,7 @@ async function playAgain(){
 async function leaveRoom(){
   clearInterval(tInt); removeListeners();
   document.getElementById('result-ov').style.display='none';
-  try{ await fbUpdate('rooms/'+roomCode,{status:'abandoned'}); }catch(e){}
+  try{ if(roomCode && db) await fbUpdate('rooms/'+roomCode,{status:'abandoned'}); }catch(e){}
   roomCode=''; myRole='';
   showScreen('home');
 }
@@ -914,17 +920,8 @@ function sound(type){
         o2.start(ctx.currentTime+i*.12); o2.stop(ctx.currentTime+i*.12+.3);
       });
     }
-  }catch(e){}
+  }catch(e){ console.log('Audio not supported');}
 }
-
-// ════════════════════════════════════════════════════════
-//  تحذير Firebase غير مفعّل
-// ════════════════════════════════════════════════════════
-window.addEventListener('load',()=>{
-  if(!firebaseReady){
-    notif('⚠️ Firebase غير مفعّل — اتواصل مع المطور Abram','error',8000);
-  }
-});
 </script>
 </body>
 </html>
