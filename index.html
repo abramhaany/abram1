@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>تحدي المعلومات - النسخة النهائية</title>
+<title>تحدي الكتاب المقدس</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -162,19 +162,6 @@ input:focus, select:focus {
   border-color: #ef4565;
 }
 
-.offline-badge {
-  position: absolute;
-  top: -8px;
-  left: 5px;
-  right: auto;
-  background: #ef4565;
-  color: white;
-  font-size: 9px;
-  padding: 2px 6px;
-  border-radius: 20px;
-  font-weight: bold;
-}
-
 .player-name {
   font-size: 12px;
   color: #9090b0;
@@ -258,6 +245,7 @@ input:focus, select:focus {
   font-size: 11px;
   font-weight: 700;
   margin-bottom: 5px;
+  text-align: center;
 }
 
 .q-text {
@@ -265,6 +253,7 @@ input:focus, select:focus {
   font-weight: 700;
   line-height: 1.5;
   margin: 15px 0;
+  text-align: center;
 }
 
 .choice-btn {
@@ -537,11 +526,17 @@ input:focus, select:focus {
   text-align: center;
 }
 
-.leave-btn {
-  background: #ef4565;
-  color: white;
-  border: none;
-  margin-top: 10px;
+.bible-icon {
+  font-size: 40px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.question-number {
+  text-align: center;
+  font-size: 12px;
+  color: #7c6fff;
+  margin-top: 5px;
 }
 </style>
 </head>
@@ -550,18 +545,11 @@ input:focus, select:focus {
 <!-- الشاشة الرئيسية -->
 <div id="screen-home" class="screen active">
   <div class="card">
-    <h1>⚡ تحدي المعلومات</h1>
-    <div class="subtitle">العب ضد صديقك من أي مكان</div>
+    <div class="bible-icon">📖✝️</div>
+    <h1>تحدي الكتاب المقدس</h1>
+    <div class="subtitle">العب مع صديقك واختبر معرفتك بالكتاب المقدس</div>
     
     <input type="text" id="player-name" placeholder="اسمك" maxlength="15">
-    
-    <select id="category">
-      <option value="general">🌍 معلومات عامة</option>
-      <option value="sports">⚽ رياضة</option>
-      <option value="history">📜 تاريخ</option>
-      <option value="science">🔬 علوم</option>
-      <option value="arab">🗺️ الوطن العربي</option>
-    </select>
     
     <button class="btn btn-primary" onclick="createRoom()">🏠 إنشاء غرفة جديدة</button>
     
@@ -576,6 +564,7 @@ input:focus, select:focus {
 <div id="screen-lobby" class="screen">
   <div class="card">
     <div class="text-center">
+      <div class="bible-icon">📖</div>
       <div style="color:#9090b0;font-size:12px">كود الغرفة</div>
       <div class="room-code" id="room-code-display">------</div>
       <button class="btn btn-secondary" onclick="copyCode()" style="margin-top:10px">📋 نسخ الكود</button>
@@ -617,7 +606,7 @@ input:focus, select:focus {
       </div>
       <div class="round-info">
         <div class="round-label">الجولة</div>
-        <div class="round-number" id="round-num">0/6</div>
+        <div class="round-number" id="round-num">0/10</div>
       </div>
       <div class="player-card" id="player2-card">
         <div class="player-name" id="name-p2">اللاعب 2</div>
@@ -629,12 +618,13 @@ input:focus, select:focus {
       <div class="timer-bar">
         <div class="timer-fill" id="timer-fill" style="width:100%"></div>
       </div>
-      <div class="timer-text" id="timer-text">— ثانية</div>
+      <div class="timer-text" id="timer-text">30 ثانية</div>
     </div>
     
     <div class="q-card">
-      <div class="q-category" id="q-cat">معلومات عامة</div>
+      <div class="q-category">📖 الكتاب المقدس</div>
       <div class="q-text" id="q-text">في انتظار بدء اللعبة...</div>
+      <div class="question-number" id="question-num"></div>
       <div id="choices-container"></div>
     </div>
     
@@ -675,57 +665,76 @@ const firebaseConfig = {
   appId: "1:959500982230:web:0e292eec3297e363e77677"
 };
 
-// ==================== الأسئلة ====================
-const QUESTIONS = {
-  general: [
-    { q: "ما هي عاصمة مصر؟", c: ["الإسكندرية", "القاهرة", "الجيزة", "أسوان"], a: "القاهرة" },
-    { q: "كم عدد ألوان قوس قزح؟", c: ["5", "6", "7", "8"], a: "7" },
-    { q: "ما هو أكبر محيط في العالم؟", c: ["الأطلسي", "الهندي", "الهادئ", "المتجمد"], a: "الهادئ" },
-    { q: "الذهب رمزه الكيميائي Au", c: ["صح", "خطأ"], a: "صح" },
-    { q: "ما هي أصغر دولة في العالم؟", c: ["موناكو", "الفاتيكان", "سان مارينو", "مالطا"], a: "الفاتيكان" },
-    { q: "كم عدد قارات العالم؟", c: ["5", "6", "7", "8"], a: "7" }
-  ],
-  sports: [
-    { q: "كم عدد لاعبي كرة القدم داخل الملعب؟", c: ["20", "22", "24", "26"], a: "22" },
-    { q: "من فاز بجائزة الكرة الذهبية 2022؟", c: ["ميسي", "رونالدو", "مبابي", "بنزيما"], a: "ميسي" },
-    { q: "منتخب أي دولة فاز بكأس العالم 2018؟", c: ["البرازيل", "ألمانيا", "فرنسا", "إسبانيا"], a: "فرنسا" },
-    { q: "محمد صلاح لاعب من أي دولة؟", c: ["المغرب", "تونس", "مصر", "الجزائر"], a: "مصر" },
-    { q: "كم مرة فازت مصر بكأس أمم أفريقيا؟", c: ["5", "6", "7", "8"], a: "7" },
-    { q: "من هو هداف التاريخ في كأس العالم؟", c: ["ميسي", "رونالدو", "كلوزه", "بيليه"], a: "كلوزه" }
-  ],
-  history: [
-    { q: "في أي عام انتهت الحرب العالمية الثانية؟", c: ["1943", "1944", "1945", "1946"], a: "1945" },
-    { q: "من بنى الأهرامات؟", c: ["الفراعنة", "الرومان", "اليونان", "العرب"], a: "الفراعنة" },
-    { q: "من قاد فتح الأندلس؟", c: ["طارق بن زياد", "موسى بن نصير", "عقبة بن نافع", "خالد بن الوليد"], a: "طارق بن زياد" },
-    { q: "في أي عام سقطت الخلافة العثمانية؟", c: ["1918", "1922", "1924", "1926"], a: "1924" },
-    { q: "من هو مؤسس الدولة السعودية الحديثة؟", c: ["عبدالعزيز آل سعود", "فيصل آل سعود", "خالد آل سعود", "عبدالله آل سعود"], a: "عبدالعزيز آل سعود" },
-    { q: "معركة حطين وقعت في أي عام؟", c: ["1187", "1199", "1174", "1192"], a: "1187" }
-  ],
-  science: [
-    { q: "ما هو أكبر كوكب في المجموعة الشمسية؟", c: ["المريخ", "المشتري", "زحل", "الأرض"], a: "المشتري" },
-    { q: "ما هو رمز عنصر الأكسجين؟", c: ["O", "Ox", "Om", "Og"], a: "O" },
-    { q: "الضوء يسير أسرع من الصوت", c: ["صح", "خطأ"], a: "صح" },
-    { q: "ما هي سرعة الصوت في الهواء؟", c: ["300 كم/س", "1000 كم/س", "1235 كم/س", "1500 كم/س"], a: "1235 كم/س" },
-    { q: "من اخترع المصباح الكهربائي؟", c: ["اديسون", "تيسلا", "نيوتن", "اينشتاين"], a: "اديسون" },
-    { q: "ما هو أقرب كوكب إلى الشمس؟", c: ["الزهرة", "عطارد", "الأرض", "المريخ"], a: "عطارد" }
-  ],
-  arab: [
-    { q: "ما هي أكبر دولة عربية من حيث المساحة؟", c: ["السعودية", "الجزائر", "مصر", "السودان"], a: "الجزائر" },
-    { q: "ما هي عاصمة الإمارات؟", c: ["دبي", "أبوظبي", "الشارقة", "عجمان"], a: "أبوظبي" },
-    { q: "نهر النيل يمر بعدد من الدول العربية منها؟", c: ["مصر والسودان", "المغرب والجزائر", "سوريا والأردن", "السعودية واليمن"], a: "مصر والسودان" },
-    { q: "ما هي عاصمة العراق؟", c: ["البصرة", "الموصل", "بغداد", "اربيل"], a: "بغداد" },
-    { q: "أين يقع برج خليفة؟", c: ["أبوظبي", "دبي", "الشارقة", "رأس الخيمة"], a: "دبي" },
-    { q: "ما هي عملة المملكة العربية السعودية؟", c: ["دينار", "درهم", "ريال", "جنيه"], a: "ريال" }
-  ]
-};
+// ==================== أسئلة الكتاب المقدس (متجددة يومياً) ====================
+// سيتم تحديث الأسئلة بناءً على اليوم الحالي
 
-const CAT_NAMES = {
-  general: '🌍 معلومات عامة',
-  sports: '⚽ رياضة',
-  history: '📜 تاريخ',
-  science: '🔬 علوم',
-  arab: '🗺️ الوطن العربي'
-};
+function getDailyQuestions() {
+  const today = new Date();
+  const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+  
+  // 10 أسئلة مختلفة كل يوم
+  const allBibleQuestions = [
+    { q: "كم عدد أسفار العهد القديم (البروتستانتي)؟", c: ["36", "39", "42", "45"], a: "39" },
+    { q: "من هو أول إنسان خُلق حسب سفر التكوين؟", c: ["نوح", "إبراهيم", "آدم", "موسى"], a: "آدم" },
+    { q: "في أي نهر تعمّد يسوع المسيح؟", c: ["الفرات", "النيل", "الأردن", "دجلة"], a: "الأردن" },
+    { q: "كم يوماً صام يسوع في البرية؟", c: ["20 يوماً", "30 يوماً", "40 يوماً", "50 يوماً"], a: "40 يوماً" },
+    { q: "من كتب أكثر رسائل العهد الجديد؟", c: ["يوحنا", "بطرس", "بولس الرسول", "لوقا"], a: "بولس الرسول" },
+    { q: "ما اسم المدينة التي وُلد فيها يسوع المسيح؟", c: ["الناصرة", "أورشليم", "بيت لحم", "بيت عنيا"], a: "بيت لحم" },
+    { q: "كم كان عدد تلاميذ يسوع المختارين؟", c: ["10", "11", "12", "13"], a: "12" },
+    { q: "من بنى سفينة النجاة في سفر التكوين؟", c: ["إبراهيم", "موسى", "داود", "نوح"], a: "نوح" },
+    { q: "ما هو أول معجزة ليسوع حسب إنجيل يوحنا؟", c: ["إقامة لعازر", "إطعام الخمسة آلاف", "تحويل الماء إلى خمر", "شفاء الأعمى"], a: "تحويل الماء إلى خمر" },
+    { q: "في أي سفر توجد قصة داود وجليات؟", c: ["التكوين", "المزامير", "صموئيل الأول", "الملوك الأول"], a: "صموئيل الأول" },
+    { q: "من هو الملك الذي بنى الهيكل في أورشليم؟", c: ["داود", "سليمان", "آسا", "يهوشافاط"], a: "سليمان" },
+    { q: "من الذي خان يسوع بثلاثين من الفضة؟", c: ["بطرس", "يوحنا", "يهوذا", "توما"], a: "يهوذا" },
+    { q: "كم عدد وصايا الله العشر؟", c: ["5", "7", "10", "12"], a: "10" },
+    { q: "من هو النبي الذي بلعه الحوت؟", c: ["إشعياء", "إرميا", "يونان", "داود"], a: "يونان" },
+    { q: "ما هو اسم الجبل الذي نزلت فيه الوصايا العشر؟", c: ["جبل الزيتون", "جبل سيناء", "جبل طابور", "جبل الكرمل"], a: "جبل سيناء" },
+    { q: "من هو أول شهيد في المسيحية؟", c: ["بطرس", "بولس", "استفانوس", "يعقوب"], a: "استفانوس" },
+    { q: "ما هو أقصر إصحاح في الكتاب المقدس؟", c: ["مزمور 117", "مزمور 23", "مزمور 1", "مزمور 150"], a: "مزمور 117" },
+    { q: "من هو الشخص الذي عاش أطول عمر في الكتاب المقدس؟", c: ["آدم", "نوح", "متوشالح", "إبراهيم"], a: "متوشالح" },
+    { q: "من هو النبي الذي صعد إلى السماء بمركبة نارية؟", c: ["إشعياء", "إرميا", "إيليا", "أليشع"], a: "إيليا" },
+    { q: "كم عدد أسفار العهد الجديد؟", c: ["24", "25", "26", "27"], a: "27" },
+    { q: "من هو تلميذ يسوع الذي شك في قيامته؟", c: ["بطرس", "أندراوس", "توما", "فيليبس"], a: "توما" },
+    { q: "أين كان بولس الرسول من قبل أن يهتدي؟", c: ["أورشليم", "رومية", "طرسوس", "أنطاكية"], a: "طرسوس" },
+    { q: "من هي أم مريم العذراء؟", c: ["حنة", "إليصابات", "راحيل", "رفقة"], a: "حنة" },
+    { q: "من هو ابن إبراهيم الذي كاد أن يذبحه؟", c: ["اسماعيل", "اسحق", "يعقوب", "عيسو"], a: "اسحق" },
+    { q: "من هو رئيس الكهنة عندما حوكم يسوع؟", c: ["حنان", "قيافا", "زكريا", "أليعازر"], a: "قيافا" },
+    { q: "ما هي اللغة التي كُتب بها العهد الجديد؟", c: ["العبرية", "اليونانية", "الآرامية", "اللاتينية"], a: "اليونانية" },
+    { q: "من هو الكاهن الذي بارك الطفل يسوع في الهيكل؟", c: ["زكريا", "حنان", "سمعان", "قيافا"], a: "سمعان" },
+    { q: "كم كان عمر يسوع عندما صعد إلى الهيكل مع والديه؟", c: ["10 سنوات", "12 سنة", "14 سنة", "16 سنة"], a: "12 سنة" }
+  ];
+  
+  // استخدام رقم اليوم لاختيار 10 أسئلة عشوائية مختلفة كل يوم
+  const shuffled = [...allBibleQuestions];
+  for(let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  
+  // خلط إضافي بناءً على رقم اليوم
+  const seed = dayOfYear;
+  for(let i = 0; i < shuffled.length; i++) {
+    const swapIndex = (i + seed) % shuffled.length;
+    [shuffled[i], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[i]];
+  }
+  
+  return shuffled.slice(0, 10);
+}
+
+let BIBLE_QUESTIONS = getDailyQuestions();
+
+// تحديث الأسئلة كل يوم جديد
+function updateDailyQuestions() {
+  const today = new Date().toDateString();
+  const lastUpdate = localStorage.getItem('lastQuestionUpdate');
+  
+  if(lastUpdate !== today) {
+    BIBLE_QUESTIONS = getDailyQuestions();
+    localStorage.setItem('lastQuestionUpdate', today);
+    console.log('تم تحديث الأسئلة لهذا اليوم');
+  }
+}
+updateDailyQuestions();
 
 // ==================== متغيرات اللعبة ====================
 let db;
@@ -743,7 +752,7 @@ let isGameActive = false;
 
 let currentQuestion = null;
 let currentRound = 0;
-let totalRounds = 6;
+let totalRounds = 10;
 let scores = { p1: 0, p2: 0 };
 let playerNames = { p1: '', p2: '' };
 let questionsList = [];
@@ -761,7 +770,6 @@ function initFirebase() {
     firebaseReady = true;
     console.log('✅ Firebase connected');
     
-    // مراقبة الاتصال
     db.ref('.info/connected').on('value', (snap) => {
       if(snap.val()) {
         console.log('✅ Connected to Firebase');
@@ -816,12 +824,10 @@ function shuffleArray(arr) {
 function setupPresenceTracking() {
   if(!roomCode) return;
   
-  // تسجيل وجود اللاعب الحالي
   const userPresenceRef = db.ref(`presence/${roomCode}/${myRole}`);
   userPresenceRef.set(true);
   userPresenceRef.onDisconnect().remove();
   
-  // مراقبة وجود اللاعب الآخر
   if(presenceListener) presenceListener.off();
   const otherRole = myRole === 'host' ? 'guest' : 'host';
   presenceListener = db.ref(`presence/${roomCode}/${otherRole}`);
@@ -829,7 +835,6 @@ function setupPresenceTracking() {
     const isOnline = snap.val() === true;
     opponentOnline = isOnline;
     
-    // تحديث واجهة المستخدم لإظهار حالة الخصم
     const playerCard = document.getElementById(myRole === 'host' ? 'player2-card' : 'player1-card');
     const lobbyCard = document.getElementById(myRole === 'host' ? 'player2-card-lobby' : 'player1-card-lobby');
     
@@ -866,16 +871,15 @@ async function createRoom() {
   
   roomCode = generateCode();
   myRole = 'host';
-  const category = document.getElementById('category').value;
   
-  let qs = [...(QUESTIONS[category] || QUESTIONS.general)];
-  qs = shuffleArray(qs).slice(0, totalRounds);
+  // تحديث الأسئلة قبل بدء اللعبة
+  updateDailyQuestions();
+  let qs = shuffleArray([...BIBLE_QUESTIONS]).slice(0, totalRounds);
   questionsList = [...qs];
   
   const roomData = {
     host: myName,
     guest: null,
-    category: category,
     status: 'waiting',
     scores: { p1: 0, p2: 0 },
     currentRound: 0,
@@ -892,21 +896,9 @@ async function createRoom() {
     showLobby();
     listenToRoom();
     setupPresenceTracking();
-    setupHostConnectionCheck();
   } catch(e) {
     showNotification('خطأ: ' + e.message, 'error');
   }
-}
-
-function setupHostConnectionCheck() {
-  // المضيف يغادر الصفحة
-  window.addEventListener('beforeunload', () => {
-    if(roomCode && myRole === 'host') {
-      db.ref(`rooms/${roomCode}`).update({ status: 'abandoned' });
-      db.ref(`presence/${roomCode}/${myRole}`).remove();
-      showNotification('تم مغادرة الغرفة', 'warning');
-    }
-  });
 }
 
 // ==================== انضمام للغرفة ====================
@@ -949,7 +941,7 @@ async function joinRoom() {
     myRole = 'guest';
     playerNames.p1 = roomData.host;
     playerNames.p2 = myName;
-    totalRounds = roomData.totalRounds || 6;
+    totalRounds = roomData.totalRounds || 10;
     questionsList = [...(roomData.questions || [])];
     
     await db.ref(`rooms/${roomCode}`).update({
@@ -962,7 +954,6 @@ async function joinRoom() {
     listenToRoom();
     setupPresenceTracking();
     
-    // إشعار للمضيف
     showNotification('✅ تم الانضمام إلى الغرفة!', 'success');
     
   } catch(e) {
@@ -994,7 +985,6 @@ function listenToRoom() {
   roomListener.on('value', (snapshot) => {
     const room = snapshot.val();
     if(!room) {
-      // الغرفة لم تعد موجودة (الخصم خرج)
       if(isGameActive) {
         showNotification('❌ الخصم غادر اللعبة!', 'error');
         setTimeout(() => goHome(), 2000);
@@ -1005,14 +995,12 @@ function listenToRoom() {
       return;
     }
     
-    // الغرفة تم التخلي عنها
     if(room.status === 'abandoned') {
       showNotification('❌ الخصم غادر الغرفة!', 'error');
       goHome();
       return;
     }
     
-    // لاعب ثاني انضم (للمضيف)
     if(myRole === 'host' && room.guest && !playerNames.p2) {
       playerNames.p2 = room.guest;
       document.getElementById('p2-name').textContent = room.guest;
@@ -1022,7 +1010,6 @@ function listenToRoom() {
       showNotification(`${room.guest} انضم إلى الغرفة!`, 'success');
     }
     
-    // بدء اللعبة
     if(room.status === 'playing' && !isGameActive) {
       scores = room.scores || { p1: 0, p2: 0 };
       playerNames.p1 = room.host;
@@ -1030,7 +1017,6 @@ function listenToRoom() {
       startGameUI();
     }
     
-    // انتهاء اللعبة
     if(room.status === 'finished' && isGameActive) {
       showResultScreen(room.scores);
     }
@@ -1072,7 +1058,6 @@ function startGameUI() {
   if(currentQuestionListener) currentQuestionListener.off();
   if(roundResultListener) roundResultListener.off();
   
-  // استماع للسؤال الجديد
   currentQuestionListener = db.ref(`rooms/${roomCode}/currentQuestion`);
   currentQuestionListener.on('value', (snapshot) => {
     const data = snapshot.val();
@@ -1083,11 +1068,10 @@ function startGameUI() {
       doubleActive = false;
       document.getElementById('round-num').textContent = `${currentRound}/${totalRounds}`;
       displayQuestion();
-      startTimer(25);
+      startTimer(30);
     }
   });
   
-  // استماع للنتائج
   roundResultListener = db.ref(`rooms/${roomCode}/roundResult`);
   roundResultListener.on('value', (snapshot) => {
     const data = snapshot.val();
@@ -1110,7 +1094,6 @@ function startGameUI() {
   
   listenToChat();
   
-  // المضيف يبدأ أول سؤال فوراً
   if(myRole === 'host') {
     setTimeout(() => nextQuestion(), 1000);
   } else {
@@ -1140,11 +1123,10 @@ async function nextQuestion() {
 function displayQuestion() {
   if(!currentQuestion) return;
   
-  const category = document.getElementById('category')?.value || 'general';
-  document.getElementById('q-cat').textContent = CAT_NAMES[category] || 'معلومات عامة';
-  document.getElementById('q-text').textContent = currentQuestion.q;
+  document.getElementById('q-cat').innerHTML = '📖 الكتاب المقدس';
+  document.getElementById('q-text').innerHTML = currentQuestion.q;
+  document.getElementById('question-num').innerHTML = `السؤال ${currentRound} من ${totalRounds}`;
   
-  // تحديد دور من يجيب (سؤال للمضيف، سؤال للضيف، بالتناوب)
   const isHostTurn = (currentRound % 2 === 1);
   const isMyTurn = (myRole === 'host' && isHostTurn) || (myRole === 'guest' && !isHostTurn);
   
@@ -1184,7 +1166,7 @@ function submitAnswer(answer) {
   }
   
   document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
-  showNotification(isCorrect ? `✅ صحيح! +${points}` : '❌ خطأ', isCorrect ? 'success' : 'error');
+  showNotification(isCorrect ? `✅ صحيح! +${points} نقطة` : '❌ خطأ', isCorrect ? 'success' : 'error');
   
   const gameOver = (currentRound >= totalRounds || questionsList.length === 0);
   
@@ -1385,7 +1367,6 @@ function leaveGame() {
 }
 
 function goHome() {
-  // تنظيف المستمعين
   if(roomListener) roomListener.off();
   if(currentQuestionListener) currentQuestionListener.off();
   if(roundResultListener) roundResultListener.off();
@@ -1393,7 +1374,6 @@ function goHome() {
   if(presenceListener) presenceListener.off();
   if(timerInterval) clearInterval(timerInterval);
   
-  // حذف حضور اللاعب
   if(roomCode && db) {
     db.ref(`presence/${roomCode}/${myRole}`).remove();
     db.ref(`rooms/${roomCode}`).update({ status: 'abandoned' }).catch(e => console.log(e));
@@ -1421,6 +1401,11 @@ function copyCode() {
   navigator.clipboard.writeText(roomCode);
   showNotification('✅ تم نسخ الكود', 'success');
 }
+
+// تحديث الأسئلة عند فتح الصفحة
+window.addEventListener('load', () => {
+  updateDailyQuestions();
+});
 </script>
 </body>
 </html>
