@@ -152,8 +152,6 @@ input:focus { outline: none; border-color: #7c6fff; }
 .text-center { text-align: center; }
 .divider { display: flex; align-items: center; gap: 8px; margin: 12px 0; color: #9090b0; }
 .divider hr { flex: 1; height: 1px; background: rgba(124,111,255,0.3); border: none; }
-
-/* قائمة المتصدرين */
 .leaderboard-card {
   background: rgba(28,28,39,0.6);
   border-radius: 18px;
@@ -175,29 +173,13 @@ input:focus { outline: none; border-color: #7c6fff; }
   border-bottom: 1px solid rgba(124,111,255,0.1);
   font-size: 13px;
 }
-.leaderboard-rank {
-  width: 30px;
-  font-weight: 700;
-  color: #7c6fff;
-}
-.leaderboard-name {
-  flex: 1;
-  text-align: right;
-}
-.leaderboard-score {
-  font-weight: 700;
-  color: #ffd166;
-}
-.top-three {
-  background: rgba(124,111,255,0.1);
-  border-radius: 12px;
-  margin: 2px 0;
-}
+.leaderboard-rank { width: 30px; font-weight: 700; color: #7c6fff; }
+.leaderboard-name { flex: 1; text-align: right; }
+.leaderboard-score { font-weight: 700; color: #ffd166; }
 </style>
 </head>
 <body>
 
-<!-- الشاشة الرئيسية -->
 <div id="screen-home" class="screen active">
   <div class="card">
     <div class="text-center"><div style="font-size: 45px;">📖✝️</div></div>
@@ -209,8 +191,7 @@ input:focus { outline: none; border-color: #7c6fff; }
     <input type="text" id="join-code" placeholder="كود الغرفة (6 أحرف)" maxlength="6" style="text-align:center;font-size:20px;letter-spacing:4px">
     <button class="btn btn-secondary" onclick="joinRoom()">🎮 انضم إلى غرفة</button>
     
-    <!-- قائمة المتصدرين العالمية -->
-    <div class="leaderboard-card" id="leaderboard-home">
+    <div class="leaderboard-card">
       <div class="leaderboard-title">🏆 قائمة المتصدرين العالميين 🏆</div>
       <div id="global-leaderboard-list">
         <div style="text-align:center;padding:10px"><div class="loading-spinner"></div><div style="margin-top:5px">جاري التحميل...</div></div>
@@ -219,7 +200,6 @@ input:focus { outline: none; border-color: #7c6fff; }
   </div>
 </div>
 
-<!-- شاشة الانتظار -->
 <div id="screen-lobby" class="screen">
   <div class="card">
     <div class="text-center">
@@ -238,7 +218,6 @@ input:focus { outline: none; border-color: #7c6fff; }
   </div>
 </div>
 
-<!-- شاشة اللعبة -->
 <div id="screen-game" class="screen">
   <div class="card" style="padding:12px">
     <div class="scoreboard">
@@ -264,7 +243,6 @@ input:focus { outline: none; border-color: #7c6fff; }
 </div>
 
 <script>
-// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAZkQmg9k3RXoaCU3E2tP-jHcXIYwNpLJA",
   authDomain: "bero-a2b6b.firebaseapp.com",
@@ -288,9 +266,7 @@ const QUESTIONS = [
   { q: "أول معجزة ليسوع؟", c: ["إقامة لعازر", "إطعام 5000", "تحويل الماء لخمر", "شفاء أعمى"], a: "تحويل الماء لخمر" },
   { q: "قصة داود وجليات في أي سفر؟", c: ["التكوين", "المزامير", "صموئيل أول", "الملوك أول"], a: "صموئيل أول" },
   { q: "من هو الملك الذي بنى الهيكل؟", c: ["شاؤول", "داود", "سليمان", "حزقيا"], a: "سليمان" },
-  { q: "من هو تلميذ يسوع الذي خانه؟", c: ["بطرس", "يوحنا", "يهوذا", "متى"], a: "يهوذا" },
-  { q: "كم سنة جال بنو إسرائيل في البرية؟", c: ["20", "40", "60", "80"], a: "40" },
-  { q: "من هو أول نبي؟", c: ["إبراهيم", "آدم", "نوح", "إدريس"], a: "آدم" }
+  { q: "من هو تلميذ يسوع الذي خانه؟", c: ["بطرس", "يوحنا", "يهوذا", "متى"], a: "يهوذا" }
 ];
 
 // تهيئة Firebase
@@ -315,7 +291,6 @@ let timerInterval = null;
 let roomRef = null;
 let chatRef = null;
 
-// دوال مساعدة
 function showNotification(msg, type) {
   let div = document.createElement('div');
   div.style.cssText = `position:fixed;top:70px;left:50%;transform:translateX(-50%);background:rgba(28,28,39,0.95);backdrop-filter:blur(12px);border:1px solid ${type === 'success' ? '#06d6a0' : type === 'error' ? '#ef4565' : '#7c6fff'};color:${type === 'success' ? '#06d6a0' : type === 'error' ? '#ef4565' : '#7c6fff'};padding:8px 16px;border-radius:30px;font-size:13px;font-weight:600;z-index:1000;white-space:nowrap;max-width:90vw;text-align:center`;
@@ -346,94 +321,56 @@ function shuffleArray(arr) {
 // =============== قائمة المتصدرين ===============
 async function updateLeaderboard(playerName, score) {
   if(!playerName || score === undefined) return;
-  
   let leaderboardRef = db.ref('leaderboard');
   let snapshot = await leaderboardRef.orderByChild('score').once('value');
-  
-  let players = [];
-  snapshot.forEach(child => {
-    players.push({ name: child.key, score: child.val().score });
-  });
-  
-  let existing = players.find(p => p.name === playerName);
+  let existing = false;
+  snapshot.forEach(child => { if(child.key === playerName) existing = true; });
   if(existing) {
-    if(score > existing.score) {
-      await leaderboardRef.child(playerName).set({ score: score, updatedAt: Date.now() });
-    }
+    let oldScore = snapshot.child(playerName).val().score;
+    if(score > oldScore) await leaderboardRef.child(playerName).set({ score: score, updatedAt: Date.now() });
   } else {
     await leaderboardRef.child(playerName).set({ score: score, updatedAt: Date.now() });
   }
-  
   loadGlobalLeaderboard();
 }
 
 async function loadGlobalLeaderboard() {
   let leaderboardRef = db.ref('leaderboard');
   let snapshot = await leaderboardRef.orderByChild('score').once('value');
-  
   let players = [];
-  snapshot.forEach(child => {
-    players.push({ name: child.key, score: child.val().score });
-  });
-  
+  snapshot.forEach(child => { players.push({ name: child.key, score: child.val().score }); });
   players.sort((a, b) => b.score - a.score);
   let topPlayers = players.slice(0, 10);
-  
   let container = document.getElementById('global-leaderboard-list');
   if(!container) return;
-  
-  if(topPlayers.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:10px;color:#9090b0">لا توجد نتائج بعد</div>';
-    return;
-  }
-  
+  if(topPlayers.length === 0) { container.innerHTML = '<div style="text-align:center;padding:10px;color:#9090b0">لا توجد نتائج بعد</div>'; return; }
   let html = '';
   topPlayers.forEach((player, index) => {
     let rank = index + 1;
-    let medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-    html += `
-      <div class="leaderboard-item ${rank <= 3 ? 'top-three' : ''}">
-        <div class="leaderboard-rank">${medal ? medal : rank}</div>
-        <div class="leaderboard-name">${player.name}</div>
-        <div class="leaderboard-score">${player.score} pts</div>
-      </div>
-    `;
+    let medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+    html += `<div class="leaderboard-item"><div class="leaderboard-rank">${medal}</div><div class="leaderboard-name">${player.name}</div><div class="leaderboard-score">${player.score}</div></div>`;
   });
   container.innerHTML = html;
 }
-
-setInterval(() => { loadGlobalLeaderboard(); }, 10000);
+setInterval(() => loadGlobalLeaderboard(), 10000);
 loadGlobalLeaderboard();
 
 // =============== إنشاء غرفة ===============
 async function createRoom() {
   myName = document.getElementById('player-name').value.trim();
   if(!myName) { showNotification('أدخل اسمك', 'error'); return; }
-  
   roomCode = generateCode();
   myRole = 'host';
   remainingQuestions = shuffleArray([...QUESTIONS]).slice(0, totalRounds);
-  
   let roomData = {
-    host: myName,
-    guest: null,
-    status: 'waiting',
-    p1Score: 0,
-    p2Score: 0,
-    currentRound: 0,
-    totalRounds: totalRounds,
-    questions: remainingQuestions,
-    roundActive: false,
-    answers: { p1: false, p2: false },
-    createdAt: Date.now()
+    host: myName, guest: null, status: 'waiting',
+    p1Score: 0, p2Score: 0, currentRound: 0, totalRounds: totalRounds,
+    questions: remainingQuestions, roundActive: false, answers: { p1: false, p2: false }, createdAt: Date.now()
   };
-  
   await db.ref(`rooms/${roomCode}`).set(roomData);
-  
   document.getElementById('room-code-display').innerHTML = roomCode;
   document.getElementById('p1-name').innerHTML = myName;
   document.getElementById('p1-dot').className = 'status-dot dot-ready';
-  
   showScreen('lobby');
   listenToRoom();
   showNotification(`✅ الكود: ${roomCode}`, 'success');
@@ -443,28 +380,21 @@ async function createRoom() {
 async function joinRoom() {
   myName = document.getElementById('player-name').value.trim();
   if(!myName) { showNotification('أدخل اسمك', 'error'); return; }
-  
   let code = document.getElementById('join-code').value.trim().toUpperCase();
   if(!code || code.length !== 6) { showNotification('كود غير صحيح', 'error'); return; }
-  
   let snap = await db.ref(`rooms/${code}`).once('value');
   let room = snap.val();
-  
   if(!room) { showNotification('غرفة غير موجودة', 'error'); return; }
   if(room.guest) { showNotification('الغرفة ممتلئة', 'error'); return; }
   if(room.status !== 'waiting') { showNotification('اللعبة بدأت بالفعل', 'error'); return; }
-  
   roomCode = code;
   myRole = 'guest';
-  
   await db.ref(`rooms/${roomCode}`).update({ guest: myName });
-  
   showScreen('lobby');
   document.getElementById('room-code-display').innerHTML = roomCode;
   document.getElementById('p1-name').innerHTML = room.host;
   document.getElementById('p2-name').innerHTML = myName;
   document.getElementById('p2-dot').className = 'status-dot dot-ready';
-  
   listenToRoom();
   showNotification('✅ انضممت!', 'success');
 }
@@ -473,18 +403,12 @@ async function joinRoom() {
 function listenToRoom() {
   if(roomRef) roomRef.off();
   roomRef = db.ref(`rooms/${roomCode}`);
-  
   roomRef.on('value', (snapshot) => {
     let room = snapshot.val();
-    
-    if(!room) {
-      if(gameActive) showOpponentLeft();
-      else showNotification('تم حذف الغرفة', 'error');
-      return;
-    }
+    if(!room) { if(gameActive) showOpponentLeft(); else showNotification('تم حذف الغرفة', 'error'); return; }
     
     // في اللوبي
-    if(room.status === 'waiting' || room.status === 'ready') {
+    if(room.status === 'waiting') {
       if(myRole === 'host' && room.guest && !document.getElementById('p2-name').innerHTML.includes(room.guest)) {
         document.getElementById('p2-name').innerHTML = room.guest;
         document.getElementById('p2-dot').className = 'status-dot dot-ready';
@@ -492,7 +416,6 @@ function listenToRoom() {
         document.getElementById('lobby-start').classList.remove('hidden');
         showNotification(`🎉 ${room.guest} انضم!`, 'success');
       }
-      
       if(myRole === 'guest' && room.guest === myName) {
         document.getElementById('lobby-waiting').innerHTML = '<div class="text-center" style="padding:25px;color:#06d6a0">✅ جاهز! في انتظار بدء المضيف...</div>';
       }
@@ -533,19 +456,21 @@ function startGameUI(room) {
   currentRound = 0;
   hasAnswered = false;
   waitingNext = false;
+  remainingQuestions = [...room.questions];
   
   document.getElementById('name-p1').innerHTML = room.host;
   document.getElementById('name-p2').innerHTML = room.guest;
   document.getElementById('score-p1').innerHTML = room.p1Score;
   document.getElementById('score-p2').innerHTML = room.p2Score;
   document.getElementById('round-num').innerHTML = `0/${totalRounds}`;
-  document.getElementById('q-text').innerHTML = '<div class="loading-spinner"></div><div style="margin-top:8px">جاري تحميل السؤال...</div>';
+  document.getElementById('q-text').innerHTML = '<div class="loading-spinner"></div><div style="margin-top:8px">جاري تحميل السؤال الأول...</div>';
   document.getElementById('choices-container').innerHTML = '';
   
   listenToChat();
   
-  if(myRole === 'host' && room.currentRound === 0) {
-    setTimeout(() => sendFirstQuestion(), 500);
+  // المضيف يبدأ السؤال الأول
+  if(myRole === 'host') {
+    setTimeout(() => sendFirstQuestion(), 1000);
   }
 }
 
@@ -561,23 +486,12 @@ async function sendNextQuestion() {
     await db.ref(`rooms/${roomCode}`).update({ status: 'finished' });
     return;
   }
-  
   currentRound++;
   let q = remainingQuestions.shift();
-  
-  let questionData = {
-    q: q.q,
-    c: q.c,
-    a: q.a,
-    round: currentRound
-  };
-  
+  let questionData = { q: q.q, c: q.c, a: q.a, round: currentRound };
   await db.ref(`rooms/${roomCode}`).update({
-    currentQuestion: questionData,
-    questions: remainingQuestions,
-    roundActive: true,
-    answers: { p1: false, p2: false },
-    roundResult: null
+    currentQuestion: questionData, questions: remainingQuestions,
+    roundActive: true, answers: { p1: false, p2: false }, roundResult: null
   });
 }
 
@@ -608,7 +522,6 @@ function loadQuestion(qData, answers) {
     });
     startTimer(30);
   }
-  
   updateAnswersUI(answers);
 }
 
@@ -626,20 +539,17 @@ function updateAnswersUI(answers) {
   }
 }
 
-// =============== المؤقت ===============
 function startTimer(sec) {
   let timeLeft = sec;
   let fill = document.getElementById('timer-fill');
   let text = document.getElementById('timer-text');
   fill.style.width = '100%';
   text.innerHTML = `⏱️ ${timeLeft} ثانية`;
-  
   timerInterval = setInterval(() => {
     timeLeft--;
     let percent = (timeLeft / sec) * 100;
     fill.style.width = `${Math.max(0, percent)}%`;
     text.innerHTML = `⏱️ ${timeLeft} ثانية`;
-    
     if(timeLeft <= 0 && !hasAnswered && gameActive) {
       clearInterval(timerInterval);
       handleTimeout();
@@ -651,27 +561,18 @@ async function handleTimeout() {
   let snap = await db.ref(`rooms/${roomCode}`).once('value');
   let room = snap.val();
   if(!room || !room.roundActive) return;
-  
   let answers = room.answers || { p1: false, p2: false };
   let myKey = myRole === 'host' ? 'p1' : 'p2';
-  
   if(!answers[myKey]) {
     answers[myKey] = true;
     await db.ref(`rooms/${roomCode}/answers`).set(answers);
-    
     let both = answers.p1 && answers.p2;
     let isOver = (currentRound >= totalRounds || remainingQuestions.length === 0);
-    
     if(both || isOver) {
       await db.ref(`rooms/${roomCode}/roundResult`).set({
-        round: currentRound,
-        correctAnswer: room.currentQuestion?.a,
-        p1Answered: answers.p1,
-        p2Answered: answers.p2,
-        p1Correct: false,
-        p2Correct: false,
-        p1Earned: 0,
-        p2Earned: 0
+        round: currentRound, correctAnswer: room.currentQuestion?.a,
+        p1Answered: answers.p1, p2Answered: answers.p2,
+        p1Correct: false, p2Correct: false, p1Earned: 0, p2Earned: 0
       });
       await db.ref(`rooms/${roomCode}`).update({ roundActive: false });
       if(isOver) await db.ref(`rooms/${roomCode}`).update({ status: 'finished' });
@@ -679,51 +580,32 @@ async function handleTimeout() {
   }
 }
 
-// =============== إجابة السؤال ===============
 async function submitAnswer(answer) {
   if(hasAnswered) return;
-  
   let snap = await db.ref(`rooms/${roomCode}`).once('value');
   let room = snap.val();
   if(!room || !room.currentQuestion || room.currentQuestion.round !== currentRound) return;
-  
   let answers = room.answers || { p1: false, p2: false };
   let myKey = myRole === 'host' ? 'p1' : 'p2';
   if(answers[myKey]) return;
-  
   clearInterval(timerInterval);
   hasAnswered = true;
-  
   let isCorrect = (answer === room.currentQuestion.a);
   let points = isCorrect ? 10 : 0;
-  
   answers[myKey] = true;
-  
-  let newP1 = room.p1Score;
-  let newP2 = room.p2Score;
+  let newP1 = room.p1Score, newP2 = room.p2Score;
   if(myRole === 'host') newP1 += points;
   else newP2 += points;
-  
-  await db.ref(`rooms/${roomCode}`).update({
-    answers: answers,
-    p1Score: newP1,
-    p2Score: newP2
-  });
-  
+  await db.ref(`rooms/${roomCode}`).update({ answers: answers, p1Score: newP1, p2Score: newP2 });
   showNotification(isCorrect ? `✅ صحيح! +${points}` : `❌ خطأ! الإجابة: ${room.currentQuestion.a}`, isCorrect ? 'success' : 'error');
-  
   document.querySelectorAll('.choice-btn').forEach(btn => btn.disabled = true);
   document.getElementById('hint-btn').disabled = true;
-  
   let both = answers.p1 && answers.p2;
   let isOver = (currentRound >= totalRounds || remainingQuestions.length === 0);
-  
   if(both || isOver) {
     await db.ref(`rooms/${roomCode}/roundResult`).set({
-      round: currentRound,
-      correctAnswer: room.currentQuestion.a,
-      p1Answered: answers.p1,
-      p2Answered: answers.p2,
+      round: currentRound, correctAnswer: room.currentQuestion.a,
+      p1Answered: answers.p1, p2Answered: answers.p2,
       p1Correct: answers.p1 && (myRole === 'host' ? isCorrect : false),
       p2Correct: answers.p2 && (myRole === 'guest' ? isCorrect : false),
       p1Earned: answers.p1 && (myRole === 'host' ? points : 0),
@@ -734,42 +616,29 @@ async function submitAnswer(answer) {
   }
 }
 
-// =============== نتيجة الجولة ===============
 function showRoundResult(result) {
   waitingNext = true;
-  
   document.querySelectorAll('.choice-btn').forEach(btn => {
-    if(btn.innerText === result.correctAnswer) {
-      btn.classList.add('correct');
-    }
+    if(btn.innerText === result.correctAnswer) btn.classList.add('correct');
     btn.disabled = true;
   });
-  
   setTimeout(() => {
     waitingNext = false;
-    if(myRole === 'host') {
-      sendNextQuestion();
-    }
+    if(myRole === 'host') sendNextQuestion();
   }, 2000);
 }
 
-// =============== 50/50 ===============
 function useHint() {
   if(hintUsed || hasAnswered || !currentQuestion) return;
   hintUsed = true;
   document.getElementById('hint-btn').disabled = true;
-  
   let btns = document.querySelectorAll('.choice-btn:not(:disabled)');
   let wrong = Array.from(btns).filter(btn => btn.innerText !== currentQuestion.a);
   let toRemove = wrong.slice(0, Math.floor(wrong.length / 2));
-  toRemove.forEach(btn => {
-    btn.style.opacity = '0.3';
-    btn.disabled = true;
-  });
+  toRemove.forEach(btn => { btn.style.opacity = '0.3'; btn.disabled = true; });
   showNotification('💡 تم حذف إجابتين', 'info');
 }
 
-// =============== الشات ===============
 function listenToChat() {
   if(chatRef) chatRef.off();
   chatRef = db.ref(`rooms/${roomCode}/chat`);
@@ -785,20 +654,9 @@ function listenToChat() {
     }
   });
 }
+async function sendChat() { let input = document.getElementById('chat-input'); let text = input.value.trim(); if(!text) return; input.value = ''; await db.ref(`rooms/${roomCode}/chat`).push({ sender: myName, text: text, timestamp: Date.now() }); }
+async function sendReaction(emoji) { await db.ref(`rooms/${roomCode}/chat`).push({ sender: myName, text: emoji, timestamp: Date.now() }); }
 
-async function sendChat() {
-  let input = document.getElementById('chat-input');
-  let text = input.value.trim();
-  if(!text) return;
-  input.value = '';
-  await db.ref(`rooms/${roomCode}/chat`).push({ sender: myName, text: text, timestamp: Date.now() });
-}
-
-async function sendReaction(emoji) {
-  await db.ref(`rooms/${roomCode}/chat`).push({ sender: myName, text: emoji, timestamp: Date.now() });
-}
-
-// =============== خروج ونتائج ===============
 function showOpponentLeft() {
   if(document.querySelector('.leave-overlay')) return;
   let div = document.createElement('div');
@@ -812,33 +670,17 @@ function showOpponentLeft() {
 async function endGame(room) {
   gameActive = false;
   if(timerInterval) clearInterval(timerInterval);
-  
   let myFinal = myRole === 'host' ? room.p1Score : room.p2Score;
   let theirFinal = myRole === 'host' ? room.p2Score : room.p1Score;
   let isWin = myFinal > theirFinal;
   let isTie = myFinal === theirFinal;
-  
-  // حفظ النتيجة في قائمة المتصدرين
   await updateLeaderboard(myName, myFinal);
-  
   let div = document.createElement('div');
   div.className = 'result-overlay';
-  div.innerHTML = `<div class="result-card">
-    <div style="font-size:50px;">${isTie ? '🤝' : (isWin ? '🏆' : '😢')}</div>
-    <div style="font-size:24px;font-weight:900;margin:10px 0">${isTie ? 'تعادل!' : (isWin ? 'فزت!' : 'خسرت')}</div>
-    <div style="margin-bottom:15px">${isTie ? 'لعبة رائعة' : (isWin ? `${myFinal} نقطة` : `${theirFinal} نقطة`)}</div>
-    <div style="display:flex;justify-content:space-between;margin:15px 0">
-      <div><div style="font-size:12px">${room.host}</div><div style="font-size:28px;font-weight:900;${room.p1Score >= room.p2Score ? 'color:#ffd166' : 'color:#fff'}">${room.p1Score}</div></div>
-      <div><div style="font-size:12px">${room.guest}</div><div style="font-size:28px;font-weight:900;${room.p2Score >= room.p1Score ? 'color:#ffd166' : 'color:#fff'}">${room.p2Score}</div></div>
-    </div>
-    <button class="btn btn-primary" onclick="location.reload()">🔄 لعب مرة أخرى</button>
-    <button class="btn btn-secondary" onclick="goHome()">🏠 الرئيسية</button>
-  </div>`;
+  div.innerHTML = `<div class="result-card"><div style="font-size:50px;">${isTie ? '🤝' : (isWin ? '🏆' : '😢')}</div><div style="font-size:24px;font-weight:900;margin:10px 0">${isTie ? 'تعادل!' : (isWin ? 'فزت!' : 'خسرت')}</div><div style="margin-bottom:15px">${isTie ? 'لعبة رائعة' : (isWin ? `${myFinal} نقطة` : `${theirFinal} نقطة`)}</div><div style="display:flex;justify-content:space-between;margin:15px 0"><div><div style="font-size:12px">${room.host}</div><div style="font-size:28px;font-weight:900;${room.p1Score >= room.p2Score ? 'color:#ffd166' : 'color:#fff'}">${room.p1Score}</div></div><div><div style="font-size:12px">${room.guest}</div><div style="font-size:28px;font-weight:900;${room.p2Score >= room.p1Score ? 'color:#ffd166' : 'color:#fff'}">${room.p2Score}</div></div></div><button class="btn btn-primary" onclick="location.reload()">🔄 لعب مرة أخرى</button><button class="btn btn-secondary" onclick="goHome()">🏠 الرئيسية</button></div>`;
   document.body.appendChild(div);
 }
-
 function leaveGame() { if(confirm('مغادرة اللعبة؟')) goHome(); }
-
 function goHome() {
   if(roomRef) roomRef.off();
   if(chatRef) chatRef.off();
@@ -852,17 +694,21 @@ function goHome() {
   document.getElementById('player-name').value = "";
   loadGlobalLeaderboard();
 }
+async function leaveRoom() { if(confirm('مغادرة الغرفة؟')) { if(roomCode && db) await db.ref(`rooms/${roomCode}`).remove(); goHome(); } }
+function copyCode() { navigator.clipboard.writeText(roomCode); showNotification('✅ تم نسخ الكود', 'success'); }
 
-async function leaveRoom() { 
-  if(confirm('مغادرة الغرفة؟')) { 
-    if(roomCode && db) await db.ref(`rooms/${roomCode}`).remove(); 
-    goHome(); 
-  } 
-}
-
-function copyCode() { 
-  navigator.clipboard.writeText(roomCode); 
-  showNotification('✅ تم نسخ الكود', 'success'); 
+// زر بدء اللعبة
+async function startGame() {
+  if(myRole !== 'host') { showNotification('فقط المضيف يمكنه البدء', 'error'); return; }
+  showNotification('🚀 جاري بدء اللعبة...', 'info');
+  await db.ref(`rooms/${roomCode}`).update({
+    status: 'playing',
+    currentRound: 0,
+    p1Score: 0,
+    p2Score: 0,
+    answers: { p1: false, p2: false },
+    roundActive: false
+  });
 }
 </script>
 </body>
