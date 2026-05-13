@@ -377,8 +377,8 @@ label:first-child{margin-top:0}
     <div class="nav-item" id="nav-daily" onclick="navTo('daily')">
       <div class="nav-icon">📅</div><div class="nav-lbl">يومي</div>
     </div>
-    <div class="nav-item" id="nav-verse" onclick="navTo('verse')">
-      <div class="nav-icon">✨</div><div class="nav-lbl">آية اليوم</div>
+    <div class="nav-item" id="nav-bible" onclick="navTo('bible-books')">
+      <div class="nav-icon">📖</div><div class="nav-lbl">الكتاب</div>
     </div>
     <div class="nav-item" id="nav-hist" onclick="navTo('history')">
       <div class="nav-icon">📊</div><div class="nav-lbl">سجلي</div>
@@ -419,7 +419,7 @@ label:first-child{margin-top:0}
       </div>
       <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--tx3)">✅ يعمل بدون إنترنت — بياناتك محفوظة على جهازك</div>
       <div style="margin-top:10px;text-align:center">
-        <a href="https://www.instagram.com/abramhaany" target="_blank" style="color:#c13584;font-size:12px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="#c13584"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg> abramhaany@</a>
+        <a href="https://wa.me/201204625935" target="_blank" style="color:#25D366;font-size:12px;font-weight:700;text-decoration:none">📱 تواصل مع المطور Abram</a>
       </div>
     </div>
   </div>
@@ -462,10 +462,10 @@ label:first-child{margin-top:0}
       <div class="menu-title">الاختبار اليومي</div>
       <div class="menu-sub">أسئلة تتجدد كل يوم</div>
     </div>
-    <div class="menu-card" onclick="navTo('verse')" style="animation:fadeUp .5s .3s both">
-      <div class="menu-icon">✨</div>
-      <div class="menu-title">آية اليوم</div>
-      <div class="menu-sub">إلهام يومي من الكلمة</div>
+    <div class="menu-card" onclick="navTo('bible-books')" style="animation:fadeUp .5s .3s both">
+      <div class="menu-icon">📖</div>
+      <div class="menu-title">الكتاب المقدس</div>
+      <div class="menu-sub">اقرأ واستمع واستفسر</div>
     </div>
     <div class="menu-card" onclick="navTo('history')" style="animation:fadeUp .5s .4s both">
       <div class="menu-icon">📊</div>
@@ -606,6 +606,48 @@ label:first-child{margin-top:0}
   <div class="screen-inner"><div class="hist-list" id="hist-list"></div></div>
 </div>
 
+<!-- ══ BIBLE BOOKS (index) ══ -->
+<div id="screen-bible-books" class="screen">
+  <div class="page-hdr screen-inner">
+    <button class="back-btn" onclick="navTo('home')">←</button>
+    <div class="page-ttl">📖 الكتاب المقدس</div>
+  </div>
+  <div class="bible-tip screen-inner">💡 اضغط على أي آية للحصول على شرح بالذكاء الاصطناعي</div>
+  <div id="bible-books-list" style="padding:14px 18px 80px"></div>
+</div>
+
+<!-- ══ BIBLE READER ══ -->
+<div id="screen-bible" class="screen" style="padding:0">
+  <div class="bible-header screen-inner">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="back-btn" onclick="SS('bible-books');updateNav('bible')">←</button>
+      <div style="flex:1;font-size:1rem;font-weight:900" id="bible-page-title">📖 التكوين</div>
+    </div>
+    <div class="bible-selects">
+      <select id="bible-chap-sel" onchange="loadBibleChap()" style="flex:1"></select>
+    </div>
+  </div>
+  <div class="bible-content-wrap" id="bible-content-wrap">
+    <div style="color:var(--tx2);text-align:center;padding:50px">اختر إصحاحاً...</div>
+  </div>
+  <div class="bible-nav-btns screen-inner">
+    <button class="btn btn-s" onclick="navBibleChap(-1)">← السابق</button>
+    <button class="btn btn-s" onclick="navBibleChap(1)">التالي →</button>
+  </div>
+</div>
+
+<!-- ══ EXPLAIN ══ -->
+<div class="explain-panel" id="explain-panel" style="display:none" onclick="maybeCloseExplain(event)">
+  <div class="explain-card" onclick="event.stopPropagation()">
+    <div class="explain-header">
+      <div class="explain-ref" id="ex-ref">📖 يوحنا 3:16</div>
+      <button class="explain-close" onclick="closeExplain()">✕</button>
+    </div>
+    <div class="explain-verse-box" id="ex-verse-txt"></div>
+    <div id="ex-body"><div class="explain-loading"><div class="load-spin" style="width:36px;height:36px"></div><div style="font-size:13px" id="ex-load-txt">📖 الذكاء الاصطناعي يشرح هذه الآية...</div></div></div>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════
 // FIREBASE
@@ -656,7 +698,7 @@ function navTo(id){
 }
 
 function updateNav(id){
-  const map={home:'home',daily:'daily',verse:'verse','history':'hist'};
+  const map={home:'home',daily:'daily','bible-books':'bible','history':'hist'};
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const key=Object.keys(map).find(k=>id.startsWith(k));
   if(key){const el=document.getElementById('nav-'+map[key]);if(el)el.classList.add('active');}
@@ -1001,8 +1043,231 @@ function buildHistoryScreen(){
 // ══════════════════════════════════════
 // BIBLE — 66 books organized
 // ══════════════════════════════════════
+const BIBLE_BOOKS={
+  ot:[
+    {id:0,n:"التكوين",en:"Genesis",c:50},
+    {id:1,n:"الخروج",en:"Exodus",c:40},
+    {id:2,n:"اللاويين",en:"Leviticus",c:27},
+    {id:3,n:"العدد",en:"Numbers",c:36},
+    {id:4,n:"التثنية",en:"Deuteronomy",c:34},
+    {id:5,n:"يشوع",en:"Joshua",c:24},
+    {id:6,n:"القضاة",en:"Judges",c:21},
+    {id:7,n:"راعوث",en:"Ruth",c:4},
+    {id:8,n:"صموئيل الأول",en:"1 Samuel",c:31},
+    {id:9,n:"صموئيل الثاني",en:"2 Samuel",c:24},
+    {id:10,n:"الملوك الأول",en:"1 Kings",c:22},
+    {id:11,n:"الملوك الثاني",en:"2 Kings",c:25},
+    {id:12,n:"أخبار الأيام الأول",en:"1 Chronicles",c:29},
+    {id:13,n:"أخبار الأيام الثاني",en:"2 Chronicles",c:36},
+    {id:14,n:"عزرا",en:"Ezra",c:10},
+    {id:15,n:"نحميا",en:"Nehemiah",c:13},
+    {id:16,n:"أستير",en:"Esther",c:10},
+    {id:17,n:"أيوب",en:"Job",c:42},
+    {id:18,n:"المزامير",en:"Psalms",c:150},
+    {id:19,n:"الأمثال",en:"Proverbs",c:31},
+    {id:20,n:"الجامعة",en:"Ecclesiastes",c:12},
+    {id:21,n:"نشيد الأناشيد",en:"Song of Solomon",c:8},
+    {id:22,n:"إشعياء",en:"Isaiah",c:66},
+    {id:23,n:"إرميا",en:"Jeremiah",c:52},
+    {id:24,n:"مراثي إرميا",en:"Lamentations",c:5},
+    {id:25,n:"حزقيال",en:"Ezekiel",c:48},
+    {id:26,n:"دانيال",en:"Daniel",c:12},
+    {id:27,n:"هوشع",en:"Hosea",c:14},
+    {id:28,n:"يوئيل",en:"Joel",c:3},
+    {id:29,n:"عاموس",en:"Amos",c:9},
+    {id:30,n:"عوبديا",en:"Obadiah",c:1},
+    {id:31,n:"يونان",en:"Jonah",c:4},
+    {id:32,n:"ميخا",en:"Micah",c:7},
+    {id:33,n:"ناحوم",en:"Nahum",c:3},
+    {id:34,n:"حبقوق",en:"Habakkuk",c:3},
+    {id:35,n:"صفنيا",en:"Zephaniah",c:3},
+    {id:36,n:"حجي",en:"Haggai",c:2},
+    {id:37,n:"زكريا",en:"Zechariah",c:14},
+    {id:38,n:"ملاخي",en:"Malachi",c:4},
+  ],
+  nt:[
+    {id:39,n:"متى",en:"Matthew",c:28},
+    {id:40,n:"مرقس",en:"Mark",c:16},
+    {id:41,n:"لوقا",en:"Luke",c:24},
+    {id:42,n:"يوحنا",en:"John",c:21},
+    {id:43,n:"أعمال الرسل",en:"Acts",c:28},
+    {id:44,n:"رومية",en:"Romans",c:16},
+    {id:45,n:"كورنثوس الأولى",en:"1 Corinthians",c:16},
+    {id:46,n:"كورنثوس الثانية",en:"2 Corinthians",c:13},
+    {id:47,n:"غلاطية",en:"Galatians",c:6},
+    {id:48,n:"أفسس",en:"Ephesians",c:6},
+    {id:49,n:"فيلبي",en:"Philippians",c:4},
+    {id:50,n:"كولوسي",en:"Colossians",c:4},
+    {id:51,n:"تسالونيكي الأولى",en:"1 Thessalonians",c:5},
+    {id:52,n:"تسالونيكي الثانية",en:"2 Thessalonians",c:3},
+    {id:53,n:"تيموثاوس الأولى",en:"1 Timothy",c:6},
+    {id:54,n:"تيموثاوس الثانية",en:"2 Timothy",c:4},
+    {id:55,n:"تيطس",en:"Titus",c:3},
+    {id:56,n:"فيلمون",en:"Philemon",c:1},
+    {id:57,n:"العبرانيين",en:"Hebrews",c:13},
+    {id:58,n:"يعقوب",en:"James",c:5},
+    {id:59,n:"بطرس الأولى",en:"1 Peter",c:5},
+    {id:60,n:"بطرس الثانية",en:"2 Peter",c:3},
+    {id:61,n:"يوحنا الأولى",en:"1 John",c:5},
+    {id:62,n:"يوحنا الثانية",en:"2 John",c:1},
+    {id:63,n:"يوحنا الثالثة",en:"3 John",c:1},
+    {id:64,n:"يهوذا",en:"Jude",c:1},
+    {id:65,n:"الرؤيا",en:"Revelation",c:22},
+  ]
+};
 
+let curBibleBook=null,curBibleChap=1,curVerses=[];
 
+function buildBibleBooks(){
+  const wrap=document.getElementById('bible-books-list');wrap.innerHTML='';
+  // OT
+  const otSec=document.createElement('div');otSec.className='testament-section';
+  otSec.innerHTML=`<div class="testament-title">📜 العهد القديم (39 سفر)</div><div class="books-grid" id="ot-grid"></div>`;
+  wrap.appendChild(otSec);
+  const otGrid=otSec.querySelector('#ot-grid');
+  BIBLE_BOOKS.ot.forEach((b,i)=>{
+    const chip=document.createElement('div');chip.className='book-chip';
+    chip.style.animation=`popIn .4s ${i*.02}s both`;
+    chip.textContent=b.n;
+    chip.onclick=()=>openBibleBook(b);
+    otGrid.appendChild(chip);
+  });
+  // NT
+  const ntSec=document.createElement('div');ntSec.className='testament-section';
+  ntSec.innerHTML=`<div class="testament-title">✝️ العهد الجديد (27 سفر)</div><div class="books-grid" id="nt-grid"></div>`;
+  wrap.appendChild(ntSec);
+  const ntGrid=ntSec.querySelector('#nt-grid');
+  BIBLE_BOOKS.nt.forEach((b,i)=>{
+    const chip=document.createElement('div');chip.className='book-chip';
+    chip.style.animation=`popIn .4s ${(i+39)*.02}s both`;
+    chip.textContent=b.n;
+    chip.onclick=()=>openBibleBook(b);
+    ntGrid.appendChild(chip);
+  });
+}
+
+function openBibleBook(book){
+  curBibleBook=book;curBibleChap=1;
+  document.getElementById('bible-page-title').textContent=`📖 ${book.n}`;
+  // build chapter selector
+  const sel=document.getElementById('bible-chap-sel');sel.innerHTML='';
+  for(let i=1;i<=book.c;i++){const o=document.createElement('option');o.value=i;o.textContent=`الإصحاح ${i}`;sel.appendChild(o);}
+  SS('bible');updateNav('bible');
+  loadBibleChap();
+}
+
+async function loadBibleChap(){
+  if(!curBibleBook)return;
+  const chap=parseInt(document.getElementById('bible-chap-sel').value)||curBibleChap;
+  curBibleChap=chap;
+  const wrap=document.getElementById('bible-content-wrap');
+  wrap.innerHTML=`<div style="color:var(--tx2);text-align:center;padding:50px;font-size:2rem">📖</div>`;
+  const cacheKey=`bible_${curBibleBook.id}_${chap}`;
+  let verses=LS.g(cacheKey);
+  if(!verses){
+    try{
+      const url=`https://bible-api.com/${encodeURIComponent(curBibleBook.en)}+${chap}?translation=kjv`;
+      const res=await fetch(url);
+      if(!res.ok)throw new Error('fetch');
+      const data=await res.json();
+      if(!data.verses)throw new Error('no verses');
+      verses=data.verses.map(v=>({n:v.verse,t:v.text.trim()}));
+      LS.s(cacheKey,verses);
+    }catch(e){
+      wrap.innerHTML=`<div style="color:var(--tx2);text-align:center;padding:40px;line-height:2"><div style="font-size:2rem">📖</div><div style="font-weight:700;margin-top:10px">${curBibleBook.n} ${chap}</div><div style="font-size:12px;margin-top:8px">تعذّر تحميل النص — تحقق من الاتصال بالإنترنت</div></div>`;
+      return;
+    }
+  }
+  curVerses=verses.map(v=>({...v,ref:`${curBibleBook.n} ${chap}:${v.n}`,enRef:`${curBibleBook.en} ${chap}:${v.n}`}));
+  renderBibleChap(chap);
+}
+
+function renderBibleChap(chap){
+  const wrap=document.getElementById('bible-content-wrap');
+  let html=`<div class="bible-chap-title">الإصحاح ${chap}</div>`;
+  curVerses.forEach((v,i)=>{
+    html+=`<div class="bible-verse" id="v-${i}" onclick="showExplain(${i})"><span class="v-num">${v.n}</span><span class="v-txt">${v.t}</span></div>`;
+  });
+  wrap.innerHTML=html;
+  wrap.scrollTop=0;
+}
+
+function navBibleChap(dir){
+  if(!curBibleBook)return;
+  let c=curBibleChap+dir;
+  if(c<1)c=1;if(c>curBibleBook.c)c=curBibleBook.c;
+  curBibleChap=c;
+  document.getElementById('bible-chap-sel').value=c;
+  loadBibleChap();
+}
+
+// ══════════════════════════════════════
+// VERSE EXPLAIN
+// ══════════════════════════════════════
+async function showExplain(i){
+  const v=curVerses[i];if(!v)return;
+  document.querySelectorAll('.bible-verse').forEach(x=>x.classList.remove('selected'));
+  const el=document.getElementById('v-'+i);if(el)el.classList.add('selected');
+  document.getElementById('explain-panel').style.display='flex';
+  document.getElementById('ex-ref').textContent=`📖 ${v.ref}`;
+  document.getElementById('ex-verse-txt').textContent=v.t;
+  document.getElementById('ex-load-txt').textContent='📖 الذكاء الاصطناعي يشرح هذه الآية...';
+  document.getElementById('ex-body').innerHTML=`<div class="explain-loading"><div class="load-spin" style="width:36px;height:36px"></div><div style="font-size:13px" id="ex-load-txt">📖 الذكاء الاصطناعي يشرح هذه الآية...</div></div>`;
+  const cacheKey=`expl_ar_${v.enRef}`;
+  const cached=LS.g(cacheKey);
+  if(cached){renderExplain(cached);return;}
+  if(!navigator.onLine&&!fbOnline){
+    document.getElementById('ex-body').innerHTML=`<div style="color:var(--tx2);text-align:center;padding:20px;font-size:14px">يتطلب الشرح اتصالاً بالإنترنت</div>`;
+    return;
+  }
+  try{
+    const prompt=`أنت متخصص في الكتاب المقدس والتفسير. اشرح هذه الآية بالعربية البسيطة الواضحة.
+الآية: ${v.ref}
+النص: "${v.t}"
+اكتب الشرح بأربعة أقسام:
+المعنى: (اشرح معنى الآية في 2-3 جمل بسيطة)
+السياق: (ماذا يحدث قبل وبعد هذه الآية في 2-3 جمل)
+التطبيق: (كيف تطبق هذه الآية في حياتك اليومية في 2-3 جمل)
+الكلمات الرئيسية: (اشرح أي كلمات صعبة أو مهمة في الآية)
+اكتب بأسلوب ودود ومشجع ومناسب لجميع الأعمار. لا تستخدم تنسيق markdown.`;
+    const txt=await callAI(prompt,1000);
+    LS.s(cacheKey,txt);
+    renderExplain(txt);
+  }catch(e){
+    document.getElementById('ex-body').innerHTML=`<div style="color:var(--rd);text-align:center;padding:20px;font-size:14px">حدث خطأ — حاول مرة أخرى</div>`;
+  }
+}
+
+function renderExplain(text){
+  const sections=[
+    {key:'المعنى',icon:'💡',color:'var(--ac)'},
+    {key:'السياق',icon:'📜',color:'var(--gold)'},
+    {key:'التطبيق',icon:'🌱',color:'var(--gr)'},
+    {key:'الكلمات الرئيسية',icon:'🔑',color:'var(--ac2)'}
+  ];
+  let html='';
+  sections.forEach((sec,i)=>{
+    const nextKey=sections[i+1]?.key;
+    const keyIdx=text.indexOf(sec.key+':');
+    if(keyIdx<0)return;
+    const start=keyIdx+sec.key.length+1;
+    const end=nextKey?text.indexOf(nextKey+':',start):-1;
+    const content=(end>0?text.slice(start,end):text.slice(start)).trim();
+    if(!content)return;
+    html+=`<div class="explain-section" style="animation-delay:${i*.1}s">
+      <div class="explain-sec-title" style="color:${sec.color}">${sec.icon} ${sec.key}</div>
+      <div class="explain-sec-body">${content.replace(/\n/g,'<br>')}</div>
+    </div>`;
+  });
+  if(!html)html=`<div class="explain-sec-body" style="font-size:14px;line-height:1.85">${text.replace(/\n/g,'<br>')}</div>`;
+  document.getElementById('ex-body').innerHTML=html;
+}
+
+function closeExplain(){
+  document.getElementById('explain-panel').style.display='none';
+  document.querySelectorAll('.bible-verse').forEach(v=>v.classList.remove('selected'));
+}
+function maybeCloseExplain(e){if(e.target===document.getElementById('explain-panel'))closeExplain();}
 
 // ══════════════════════════════════════
 // ONLINE GAME
@@ -1384,173 +1649,9 @@ const _origNavTo=window.navTo;
 window.navTo=function(id){
   if(id==='daily')buildDailyScreen();
   if(id==='history')buildHistoryScreen();
-  if(id==='verse')loadVerseOfDay();
+  if(id==='bible-books'){}// already built on load
   _origNavTo(id);
 };
-
-// ══════════════════════════════════════
-// VERSE OF DAY
-// ══════════════════════════════════════
-let todayVerse=null;
-
-async function loadVerseOfDay(forceNew=false){
-  const key='verse_of_day_'+getTodayKey();
-  if(!forceNew){
-    const cached=LS.g(key);
-    if(cached){todayVerse=cached;renderVerseOfDay();return;}
-  }
-
-  // اعرض اللودنج
-  document.getElementById('verse-loading').style.display='block';
-  document.getElementById('verse-ref').style.display='none';
-  document.getElementById('verse-text').style.display='none';
-  document.getElementById('verse-explain-wrap').style.display='none';
-  document.getElementById('verse-share-wrap').style.display='none';
-
-  // تاريخ اليوم
-  const today=new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const prompt=`اليوم هو ${today}.
-اختر آية من الكتاب المقدس مناسبة لهذا اليوم وتعطي إلهاماً وقوة للمسيحيين.
-ثم اشرحها بالعربية البسيطة.
-
-أعد JSON فقط بهذا الشكل بدون أي نص أو backticks:
-{
-  "ref": "يوحنا 3:16",
-  "text": "نص الآية بالعربية (ترجمة فان دايك) كاملة",
-  "meaning": "شرح معنى الآية في 2-3 جمل بسيطة",
-  "context": "السياق التاريخي والروحي في جملة أو جملتين",
-  "apply": "كيف تطبق هذه الآية في حياتك اليومية في جملتين",
-  "prayer": "صلاة قصيرة مستوحاة من الآية (3-4 أسطر)"
-}`;
-
-  try{
-    const txt=await callAI(prompt,800);
-    const clean=txt.replace(/```json|```/g,'').trim();
-    const s=clean.indexOf('{'),e=clean.lastIndexOf('}');
-    if(s>=0&&e>s){
-      const parsed=JSON.parse(clean.slice(s,e+1));
-      if(parsed.ref&&parsed.text){
-        todayVerse=parsed;
-        LS.s(key,parsed);
-        renderVerseOfDay();
-        return;
-      }
-    }
-    throw new Error('Invalid response');
-  }catch(err){
-    // fallback verses
-    const fallbackVerses=[
-      {ref:'يوحنا 3:16',text:'لأنه هكذا أحب الله العالم حتى بذل ابنه الوحيد لكي لا يهلك كل من يؤمن به بل تكون له الحياة الأبدية',meaning:'هذه الآية هي قلب الإنجيل — الله يحبنا حباً لا حدود له حتى قدّم ابنه الوحيد فداءً عنا. هذا الحب غير مشروط ومتاح للجميع.',context:'قالها يسوع لنيقوديموس معلم اليهود في محادثة ليلية سرية. كان يشرح له معنى الولادة من جديد والخلاص.',apply:'اليوم تذكّر أن الله يحبك بالفعل كما أنت. لا حاجة لأن تكون مثالياً — فقط آمن واستقبل هذا الحب في قلبك.',prayer:'يا رب، شكراً لحبك العظيم الذي لا تحده حدود. ساعدني أن أعيش اليوم وأنا ممتلئ بهذا الحب، وأن أنقله لمن حولي. آمين.'},
-      {ref:'مزمور 23:1',text:'الرب راعيّ فلا يعوزني شيء',meaning:'هذه الآية تعلن ثقة داود الكاملة في الرب. كما يعتني الراعي بخرافه، كذلك الله يعتني بكل احتياجاتنا.',context:'كتب داود هذا المزمور من تجربته الشخصية كراعٍ للغنم، ثم كملك مرّ بتجارب صعبة كثيرة لكن الله لم يتركه.',apply:'مهما كانت مشاكلك اليوم، تذكّر أن الله راعيك وهو أكبر من كل مشكلة. توكّل عليه في كل أمر صغير وكبير.',prayer:'يا رب راعيّ الصالح، أسلّم لك يومي كاملاً. أنت تعرف احتياجاتي قبل أن أطلبها. كن معي في كل خطوة. آمين.'},
-      {ref:'فيلبي 4:13',text:'أستطيع كل شيء في المسيح الذي يقويني',meaning:'بولس الرسول كتب هذه الكلمات وهو في السجن! يقول إن القوة لا تأتي من ظروفه بل من المسيح الذي يسكن فيه.',context:'كتبها بولس لأهل فيلبي وهو مقيّد بالسلاسل. تعلّم الاكتفاء في كل حال — في الشبع والجوع، في الغنى والفقر.',apply:'قبل أي تحدٍّ اليوم، ردد هذه الآية وآمن بها. القوة متاحة لك ليس من ذاتك بل من المسيح الساكن فيك.',prayer:'يا رب، في ضعفي أتكل على قوتك. أمنحني اليوم كل ما أحتاجه لأواجه تحديات حياتي. لك المجد. آمين.'},
-      {ref:'إرميا 29:11',text:'لأني أنا أعرف الأفكار التي أنا أفتكر بها عنكم يقول الرب أفكار سلام لا شر لأعطيكم آخرة ورجاء',meaning:'الله يعرف مستقبلك ومستقبله خير وليس شراً. حتى في أصعب اللحظات، لديه خطة رائعة لحياتك.',context:'قالها الله لشعب إسرائيل وهم في السبي البابلي — في أصعب أوقاتهم. يعلمهم أن لا ييأسوا لأن له خطة.',apply:'إذا كنت تمر بوقت صعب اليوم، تذكّر أن الله يرى الصورة كاملة. ثق في خطته حتى لو لم تفهمها الآن.',prayer:'أبي السماوي، أثق في أفكارك نحوي حتى حين لا أفهم ما يحدث. أسلّم لك مستقبلي وأرتاح في حبك. آمين.'},
-    ];
-    const doy=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5);
-    todayVerse=fallbackVerses[doy%fallbackVerses.length];
-    LS.s(key,todayVerse);
-    renderVerseOfDay();
-  }
-}
-
-function renderVerseOfDay(){
-  if(!todayVerse)return;
-  document.getElementById('verse-loading').style.display='none';
-  document.getElementById('verse-ref').style.display='inline-block';
-  document.getElementById('verse-ref').textContent=todayVerse.ref;
-  document.getElementById('verse-text').style.display='block';
-  document.getElementById('verse-text').textContent=todayVerse.text;
-  document.getElementById('verse-meaning').textContent=todayVerse.meaning||'';
-  document.getElementById('verse-context').textContent=todayVerse.context||'';
-  document.getElementById('verse-apply').textContent=todayVerse.apply||'';
-  document.getElementById('verse-prayer').textContent=todayVerse.prayer||'';
-  document.getElementById('verse-explain-wrap').style.display='block';
-  document.getElementById('verse-share-wrap').style.display='block';
-  // update date badge
-  document.getElementById('verse-date-badge').textContent=new Date().toLocaleDateString('ar-EG',{month:'short',day:'numeric'});
-}
-
-function shareVerse(){
-  if(!todayVerse)return;
-  const msg=`✝️ آية اليوم
-
-"${todayVerse.text}"
-
-📖 ${todayVerse.ref}
-
-🙏 ${todayVerse.prayer||''}
-
-— من تطبيق تحدي الكتاب المقدس`;
-  const fb=()=>{try{const ta=document.createElement('textarea');ta.value=msg;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);notif('✅ تم نسخ الآية','success');}catch{notif('الآية: '+todayVerse.ref,'info');}};
-  navigator.clipboard?.writeText(msg).then(()=>notif('✅ تم نسخ الآية','success')).catch(fb)||fb();
-}
-
-function refreshVerse(){
-  LS.d('verse_of_day_'+getTodayKey());
-  loadVerseOfDay(true);
-  notif('🔄 جاري تحميل آية جديدة...','info');
-}
-
 </script>
-
-<!-- Instagram Contact Button -->
-<a href="https://www.instagram.com/abramhaany" target="_blank" id="ig-float-btn" style="position:fixed;bottom:85px;left:16px;width:46px;height:46px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:600;box-shadow:0 4px 20px rgba(131,58,180,.5);transition:all .25s;text-decoration:none" onmouseover="this.style.transform='scale(1.15)'" onmouseout="this.style.transform='scale(1)'">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-</a>
-
-<!-- ══ VERSE OF DAY ══ -->
-<div id="screen-verse" class="screen">
-  <div class="page-hdr screen-inner">
-    <button class="back-btn" onclick="navTo('home')">←</button>
-    <div class="page-ttl">✨ آية اليوم</div>
-    <span class="page-badge" id="verse-date-badge">اليوم</span>
-  </div>
-  <div class="screen-inner" style="padding:0 18px 100px">
-
-    <!-- بطاقة الآية -->
-    <div id="verse-card" style="background:linear-gradient(135deg,rgba(108,92,231,.15),rgba(253,121,168,.1));border:1px solid rgba(108,92,231,.3);border-radius:24px;padding:28px 22px;margin-top:6px;text-align:center;animation:fadeUp .5s ease;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
-      <div style="font-size:3rem;animation:float 3s ease-in-out infinite">✝️</div>
-      <div id="verse-loading" style="color:var(--tx2);font-size:13px;font-weight:600">
-        <div class="load-spin" style="width:32px;height:32px;margin:0 auto 10px"></div>
-        جاري تحميل آية اليوم...
-      </div>
-      <div id="verse-ref" style="display:none;font-size:12px;font-weight:900;color:var(--ac);background:rgba(108,92,231,.12);padding:4px 14px;border-radius:99px"></div>
-      <div id="verse-text" style="display:none;font-size:1.1rem;font-weight:700;line-height:1.9;color:var(--tx)"></div>
-    </div>
-
-    <!-- شرح الآية -->
-    <div id="verse-explain-wrap" style="display:none;margin-top:14px;animation:fadeUp .5s .2s both">
-      <div style="background:var(--s);border:1px solid var(--br);border-radius:var(--r2);padding:20px">
-        <div style="font-size:12px;font-weight:900;color:var(--ac2);margin-bottom:12px;display:flex;align-items:center;gap:6px">🤖 شرح الذكاء الاصطناعي</div>
-
-        <div id="verse-meaning-sec" style="margin-bottom:14px">
-          <div style="font-size:11px;font-weight:900;color:var(--ac);margin-bottom:6px">💡 المعنى</div>
-          <div id="verse-meaning" style="font-size:14px;line-height:1.85;color:var(--tx)"></div>
-        </div>
-
-        <div id="verse-context-sec" style="margin-bottom:14px">
-          <div style="font-size:11px;font-weight:900;color:var(--gold);margin-bottom:6px">📜 السياق</div>
-          <div id="verse-context" style="font-size:14px;line-height:1.85;color:var(--tx)"></div>
-        </div>
-
-        <div id="verse-apply-sec" style="margin-bottom:14px">
-          <div style="font-size:11px;font-weight:900;color:var(--gr);margin-bottom:6px">🌱 التطبيق</div>
-          <div id="verse-apply" style="font-size:14px;line-height:1.85;color:var(--tx)"></div>
-        </div>
-
-        <div id="verse-prayer-sec">
-          <div style="font-size:11px;font-weight:900;color:var(--ac2);margin-bottom:6px">🙏 صلاة قصيرة</div>
-          <div id="verse-prayer" style="font-size:14px;line-height:1.85;color:var(--tx);font-style:italic"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- زر مشاركة -->
-    <div id="verse-share-wrap" style="display:none;margin-top:14px;animation:fadeUp .5s .3s both">
-      <button class="btn btn-p" onclick="shareVerse()">📤 شارك آية اليوم</button>
-      <button class="btn btn-s" style="margin-top:10px" onclick="refreshVerse()">🔄 آية أخرى</button>
-    </div>
-
-  </div>
-</div>
 </body>
 </html>
